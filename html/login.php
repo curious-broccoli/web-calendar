@@ -1,7 +1,28 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
-$stmt = $dbh->query('SELECT * FROM user;');
-var_dump($stmt->fetch());
-//echo $_POST['username'];
-//echo $_REQUEST['username'];
+
+function loginUser($dbh, $name, $password) {
+    // check if name and password fit
+    $stmt = $dbh->prepare("SELECT hash FROM user WHERE name = :name;");
+    $stmt->bindParam(":name", $name, PDO::PARAM_STR);
+    $stmt->execute();
+    $hash = $stmt->fetchColumn();
+    if ($hash == false) {
+        echo "No account with this username exists!";
+        return false;
+    }
+    if (password_verify($password, $hash)) {
+        echo "Successfully logged in!";
+        return true;
+    }
+    else {
+        echo "The password does not match the account!";
+        return false;
+    }
+}
+
+loginUser($dbh, $_POST["username"], $_POST["password"]);
+
+
+
 ?>
