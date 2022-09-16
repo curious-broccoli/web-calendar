@@ -1,12 +1,5 @@
 <?php
-function createTableUser($dbh) {
-    // autocommit is fine here
-    $dbh->query("CREATE TABLE IF NOT EXISTS user (
-        userid INTEGER PRIMARY KEY,
-        name TEXT UNIQUE NOT NULL,
-        hash TEXT NOT NULL
-        );");
-}
+require_once __DIR__ . "/../src/dbconnection.php";
 
 function isValidPassword($passwordCandidate, $name) {
     $minLength = 8;
@@ -73,16 +66,12 @@ function loginUser($dbh, $name, $password) {
     }
 }
 
-$db_name = "calendar.sqlite";
 
 try {
-    $dbh = new PDO("sqlite:$db_name");
-    // enable foreign keys support
-    $dbh->exec("PRAGMA foreign_keys = ON;");
     createTableUser($dbh);
     //$dbh->beginTransaction();
     //registerUser($dbh, "moritz", "mEin2passwort");
-    loginUser($dbh, "min", "mEin2passwort");
+    //loginUser($dbh, "min", "mEin2passwort");
 } catch (PDOException $e) {
     print "Error!: " . $e->getMessage() . "<br/>";
     die();
