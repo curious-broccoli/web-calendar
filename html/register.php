@@ -22,6 +22,10 @@ function isValidPassword($passwordCandidate, $name) {
 }
 
 function registerUser($dbh, $name, $passwordCandidate) {
+    if ( empty($name) || empty($passwordCandidate)) {
+        echo "Please enter a username and password!";
+        return false;
+    }
     // check if name is valid
     if (preg_match("/^(?=.{4,20}$)(?!.*[._-]{2})[a-zA-Z0-9._-]+$/", $name) === 0) {
         echo "The username must be at least 4 and at most 20 characters long.
