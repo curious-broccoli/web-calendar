@@ -22,8 +22,12 @@ function isValidPassword($passwordCandidate, $name) {
 }
 
 function registerUser($dbh, $name, $passwordCandidate) {
-    // check if name is valid, e.g. just letters, numbers, -, _ and minimum, maximum length
-    
+    // check if name is valid
+    if (preg_match("/^(?=.{4,20}$)(?!.*[._-]{2})[a-zA-Z0-9._-]+$/", $name) === 0) {
+        echo "The username must be at least 4 and at most 20 characters long.
+            It can contain special characters (.-_) but not two in a row!\n";
+        return false;
+    }
     // check if username is already used
     $stmt = $dbh->prepare("SELECT 1 FROM user WHERE name = :name;");
     $stmt->bindParam(":name", $name, PDO::PARAM_STR);

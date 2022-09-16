@@ -8,15 +8,15 @@ function loginUser($dbh, $name, $password) {
     $stmt->execute();
     $hash = $stmt->fetchColumn();
     if ($hash == false) {
-        echo "No account with this username exists!";
+        echo "No account with this username exists!\n";
         return false;
     }
     if (password_verify($password, $hash)) {
-        echo "Successfully logged in!";
+        echo "Successfully logged in!\n";
         return true;
     }
     else {
-        echo "The password does not match the account!";
+        echo "The password does not match the account!\n";
         return false;
     }
 }
