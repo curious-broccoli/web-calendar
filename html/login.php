@@ -11,6 +11,10 @@
 require_once __DIR__ . "/../src/dbconnection.php";
 
 function loginUser($dbh, $name, $password) {
+    if ( empty($name) || empty($password)) {
+        echo "Please enter a username and password!";
+        return false;
+    }
     // check if name and password fit
     $stmt = $dbh->prepare("SELECT hash FROM user WHERE name = :name;");
     $stmt->bindParam(":name", $name, PDO::PARAM_STR);
