@@ -1,6 +1,6 @@
 <?php
 
-function format_flash_message($message) {
+function format_flash_message(string $message) {
     return "<br>" . $message . "<br>";
 }
 

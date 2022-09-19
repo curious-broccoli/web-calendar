@@ -1,6 +1,6 @@
 <?php
 
-function create_table_user($dbh) {
+function create_table_user(PDO $dbh) {
     $dbh->query("CREATE TABLE IF NOT EXISTS user (
         userid INTEGER PRIMARY KEY,
         name TEXT UNIQUE NOT NULL,
