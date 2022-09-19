@@ -1,7 +1,9 @@
 <?php
 
 function format_flash_message(string $message) {
-    return "<br>" . $message . "<br>";
+    return sprintf('<span class="error ">%s</div>',
+        $message
+    );
 }
 
 function display_flash_message(string $name) {
