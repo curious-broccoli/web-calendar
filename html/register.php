@@ -9,7 +9,7 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
 
-function isValidPassword($passwordCandidate, $name) {
+function is_valid_password($passwordCandidate, $name) {
     $minLength = 8;
     $maxLength = 64;
     $length = strlen($passwordCandidate);
@@ -28,7 +28,7 @@ function isValidPassword($passwordCandidate, $name) {
     return true;
 }
 
-function registerUser($dbh, $name, $passwordCandidate) {
+function register_user($dbh, $name, $passwordCandidate) {
     if ( empty($name) || empty($passwordCandidate)) {
         $_SESSION["register_error_message"] = "Please enter a username and password!";
         header("Location: /index.php");
@@ -54,7 +54,7 @@ function registerUser($dbh, $name, $passwordCandidate) {
     }
 
     // check if password is valid
-    if (!isValidPassword($passwordCandidate, $name)) {
+    if (!is_valid_password($passwordCandidate, $name)) {
         header("Location: /index.php");
         die();
     }
@@ -72,7 +72,7 @@ function registerUser($dbh, $name, $passwordCandidate) {
 }
 
 session_start();
-registerUser($dbh, $_POST["username"], $_POST["password"]);
+register_user($dbh, $_POST["username"], $_POST["password"]);
 
 
 

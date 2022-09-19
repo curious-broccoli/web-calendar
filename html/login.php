@@ -10,7 +10,7 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
 
-function loginUser($dbh, $name, $password) {
+function login_user($dbh, $name, $password) {
     if ( empty($name) || empty($password)) {
         $_SESSION["login_error_message"] = "Please enter a username and password!";
         header("Location: /index.php");
@@ -40,7 +40,7 @@ function loginUser($dbh, $name, $password) {
 }
 
 session_start();
-loginUser($dbh, $_POST["username"], $_POST["password"]);
+login_user($dbh, $_POST["username"], $_POST["password"]);
 
 
 
