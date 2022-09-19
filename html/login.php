@@ -19,8 +19,7 @@ function login_user(PDO $dbh, string $name, string $password) {
 
     // check if name and password fit
     $stmt = $dbh->prepare("SELECT hash FROM user WHERE name = :name;");
-    $stmt->bindParam(":name", $name, PDO::PARAM_STR);
-    $stmt->execute();
+    $stmt->execute(array(":name" => $name));
     $hash = $stmt->fetchColumn();
     if ($hash == false) {
         $_SESSION["login_error_message"] = "No account with this username exists!\n";

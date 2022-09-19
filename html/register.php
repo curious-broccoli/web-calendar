@@ -45,8 +45,7 @@ function register_user(PDO $dbh, string $name, string $passwordCandidate) {
 
     // check if username is already used
     $stmt = $dbh->prepare("SELECT 1 FROM user WHERE name = :name;");
-    $stmt->bindParam(":name", $name, PDO::PARAM_STR);
-    $stmt->execute();
+    $stmt->execute(array(":name" => $name));
     if ($stmt->fetchColumn()) {
         $_SESSION["register_error_message"] = "This username is already taken!\n";
         header("Location: /index.php");
@@ -63,9 +62,7 @@ function register_user(PDO $dbh, string $name, string $passwordCandidate) {
     $hash = password_hash($passwordCandidate, PASSWORD_DEFAULT);
     $stmt = $dbh->prepare("INSERT INTO user (name, hash)
                             VALUES (:name, :hash);");
-    $stmt->bindParam(":name", $name, PDO::PARAM_STR);
-    $stmt->bindParam(":hash", $hash, PDO::PARAM_STR);
-    $stmt->execute();
+    $stmt->execute(array(":name" => $name, ":hash" => $hash));
     echo "Successfully registered!\n";
     // redirect to calendar
     // header(calendar.php)
