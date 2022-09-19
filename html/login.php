@@ -10,7 +10,7 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
 
-function login_user($dbh, $name, $password) {
+function login_user(PDO $dbh, string $name, string $password) {
     if ( empty($name) || empty($password)) {
         $_SESSION["login_error_message"] = "Please enter a username and password!";
         header("Location: /index.php");

@@ -9,7 +9,7 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
 
-function is_valid_password($passwordCandidate, $name) {
+function is_valid_password(string $passwordCandidate, string $name) {
     $minLength = 8;
     $maxLength = 64;
     $length = strlen($passwordCandidate);
@@ -28,7 +28,7 @@ function is_valid_password($passwordCandidate, $name) {
     return true;
 }
 
-function register_user($dbh, $name, $passwordCandidate) {
+function register_user(PDO $dbh, string $name, string $passwordCandidate) {
     if ( empty($name) || empty($passwordCandidate)) {
         $_SESSION["register_error_message"] = "Please enter a username and password!";
         header("Location: /index.php");
