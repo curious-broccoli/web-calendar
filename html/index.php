@@ -9,8 +9,8 @@
 <body>
     <h2>Login</h2>
     <form action="login.php" method="post">
-        Username:  <input type="text" name="username" /><br />
-        Password: <input type="password" name="password" /><br />
+        Username:  <input type="text" name="username" required autofocus /><br />
+        Password: <input type="password" name="password" required /><br />
         <input type="submit" name="submit" value="Login!" />
     </form>
 
@@ -24,8 +24,8 @@
     <br>
     <h2>Register</h2>
     <form action="register.php" method="post">
-        Username:  <input type="text" name="username" /><br />
-        Password: <input type="password" name="password" /><br />
+        Username:  <input type="text" name="username" required /><br />
+        Password: <input type="password" name="password" required /><br />
         <input type="submit" name="submit" value="Register!" />
     </form>
 
