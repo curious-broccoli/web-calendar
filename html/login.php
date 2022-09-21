@@ -40,6 +40,11 @@ function login_user(PDO $dbh, string $name, string $password) {
 }
 
 session_start();
+if (isset($_SESSION["user"])) {
+    $_SESSION["login_error_message"] = "You are already logged in!";
+    header("Location: /index.php");
+    die();
+}
 login_user($dbh, $_POST["username"], $_POST["password"]);
 
 
