@@ -18,17 +18,18 @@ function login_user(PDO $dbh, string $name, string $password) {
     }
 
     // check if name and password fit
-    $stmt = $dbh->prepare("SELECT hash FROM user WHERE name = :name;");
+    $stmt = $dbh->prepare("SELECT userid, hash FROM user WHERE name = :name;");
     $stmt->execute(array(":name" => $name));
-    $hash = $stmt->fetchColumn();
-    if ($hash == false) {
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($result == false) {
         $_SESSION["login_error_message"] = "No account with this username exists!\n";
         header("Location: /index.php");
         die();
     }
-    if (password_verify($password, $hash)) {
+    if (password_verify($password, $result["hash"])) {
         // redirect to calendar later on
         // header(calendar.php);
+        $_SESSION["user"] = $result["userid"];
         echo "Successfully logged in!\n";
     }
     else {
