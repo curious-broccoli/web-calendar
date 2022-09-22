@@ -69,7 +69,7 @@ function register_user(PDO $dbh, string $name, string $passwordCandidate) {
 }
 
 session_start();
-if (isset($_SESSION["user"])) {
+if (isset($_SESSION["userid"])) {
     $_SESSION["register_error_message"] = "You are already logged in!";
     header("Location: /index.php");
     die();

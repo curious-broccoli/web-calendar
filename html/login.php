@@ -29,7 +29,7 @@ function login_user(PDO $dbh, string $name, string $password) {
     if (password_verify($password, $result["hash"])) {
         // redirect to calendar later on
         // header(calendar.php);
-        $_SESSION["user"] = $result["userid"];
+        $_SESSION["userid"] = $result["userid"];
         echo "Successfully logged in!\n";
     }
     else {
@@ -40,7 +40,7 @@ function login_user(PDO $dbh, string $name, string $password) {
 }
 
 session_start();
-if (isset($_SESSION["user"])) {
+if (isset($_SESSION["userid"])) {
     $_SESSION["login_error_message"] = "You are already logged in!";
     header("Location: /index.php");
     die();
