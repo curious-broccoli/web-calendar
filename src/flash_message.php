@@ -1,5 +1,12 @@
 <?php
 
+function error_and_redirect($message) {
+    // uses define() constants
+    $_SESSION[FLASH_MESSAGE_NAME] = $message;
+    header("Location: " . ERROR_REDIRECT_LOCATION);
+    die();
+}
+
 function format_flash_message(string $message) {
     return sprintf('<span class="error ">%s</div>',
         $message

@@ -8,6 +8,7 @@
 <body>
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
+require_once __DIR__ . "/../src/flash_message.php";
 
 function is_valid_password(string $passwordCandidate, string $name) {
     $minLength = 8;
@@ -30,26 +31,21 @@ function is_valid_password(string $passwordCandidate, string $name) {
 
 function register_user(PDO $dbh, string $name, string $passwordCandidate) {
     if ( empty($name) || empty($passwordCandidate)) {
-        $_SESSION[FLASH_MESSAGE_NAME] = "Please enter a username and password!";
-        header("Location: " . ERROR_REDIRECT_LOCATION);
-        die();
+        error_and_redirect("Please enter a username and password!");
     }
 
     // check if name is valid
     if (preg_match("/^(?=.{4,20}$)(?!.*[._-]{2})[a-zA-Z0-9._-]+$/", $name) === 0) {
-        $_SESSION[FLASH_MESSAGE_NAME] = "The username must be at least 4 and at most 20
-            characters long. It can contain special characters (.-_) but not two in a row!\n";
-        header("Location: " . ERROR_REDIRECT_LOCATION);
-        die();
+        error_and_redirect("The username must be at least 4 and at most 20
+            characters long. It can contain special characters (.-_) but not
+            two in a row!\n");
     }
 
     // check if username is already used
     $stmt = $dbh->prepare("SELECT 1 FROM user WHERE name = :name;");
     $stmt->execute(array(":name" => $name));
     if ($stmt->fetchColumn()) {
-        $_SESSION[FLASH_MESSAGE_NAME] = "This username is already taken!\n";
-        header("Location: " . ERROR_REDIRECT_LOCATION);
-        die();
+        error_and_redirect("This username is already taken!\n");
     }
 
     // check if password is valid
@@ -72,9 +68,7 @@ define("FLASH_MESSAGE_NAME", "register_error_message");
 define("ERROR_REDIRECT_LOCATION", "/index.php");
 session_start();
 if (isset($_SESSION["userid"])) {
-    $_SESSION[FLASH_MESSAGE_NAME] = "You are already logged in!";
-    header("Location: " . ERROR_REDIRECT_LOCATION);
-    die();
+    error_and_redirect("You are already logged in!");
 }
 register_user($dbh, $_POST["username"], $_POST["password"]);
 

@@ -8,6 +8,8 @@
 </head>
 <body>
     <?php
+    require_once __DIR__ . "/../src/flash_message.php";
+    require_once __DIR__ . "/../src/dbconnection.php";
     session_start();
     $format = "Y-m-d H:00";
     $datetime_next_hour = date($format,strtotime("now + 1 hour "));
@@ -29,7 +31,6 @@
         <select name="series">
             <option value="">Event series</option>
             <?php
-            require_once __DIR__ . "/../src/dbconnection.php";
             $series = $dbh->query("SELECT seriesid, name FROM event_series;");
             foreach ($series as $row) {?>
                 <option value="<?=$row["seriesid"]?>"><?=$row["name"]?></option>

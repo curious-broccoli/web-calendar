@@ -9,12 +9,11 @@
     
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
+require_once __DIR__ . "/../src/flash_message.php";
 
 function login_user(PDO $dbh, string $name, string $password) {
     if ( empty($name) || empty($password)) {
-        $_SESSION[FLASH_MESSAGE_NAME] = "Please enter a username and password!";
-        header("Location: " . ERROR_REDIRECT_LOCATION);
-        die();        
+        error_and_redirect("Please enter a username and password!");
     }
 
     // check if name and password fit
@@ -22,9 +21,7 @@ function login_user(PDO $dbh, string $name, string $password) {
     $stmt->execute(array(":name" => $name));
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($result == false) {
-        $_SESSION[FLASH_MESSAGE_NAME] = "No account with this username exists!\n";
-        header("Location: " . ERROR_REDIRECT_LOCATION);
-        die();
+        error_and_redirect("No account with this username exists!\n");
     }
     if (password_verify($password, $result["hash"])) {
         // redirect to calendar later on
@@ -33,9 +30,7 @@ function login_user(PDO $dbh, string $name, string $password) {
         echo "Successfully logged in!\n";
     }
     else {
-        $_SESSION[FLASH_MESSAGE_NAME] = "The password does not match the account!\n";
-        header("Location: " . ERROR_REDIRECT_LOCATION);
-        die();
+        error_and_redirect("The password does not match the account!\n");
     }
 }
 
@@ -43,9 +38,7 @@ define("FLASH_MESSAGE_NAME", "login_error_message");
 define("ERROR_REDIRECT_LOCATION", "/index.php");
 session_start();
 if (isset($_SESSION["userid"])) {
-    $_SESSION[FLASH_MESSAGE_NAME] = "You are already logged in!";
-    header("Location: " . ERROR_REDIRECT_LOCATION);
-    die();
+    error_and_redirect("You are already logged in!");
 }
 login_user($dbh, $_POST["username"], $_POST["password"]);
 
