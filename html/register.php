@@ -14,15 +14,15 @@ function is_valid_password(string $passwordCandidate, string $name) {
     $maxLength = 64;
     $length = strlen($passwordCandidate);
     if ($length < $minLength || $length > $maxLength) {
-        $_SESSION["register_error_message"] = "The password must be at least 8 and at most 64 characters long!\n";
+        $_SESSION[FLASH_MESSAGE_NAME] = "The password must be at least 8 and at most 64 characters long!\n";
         return false;
     }
     if (stripos($passwordCandidate, $name) !== false) { // how does it work with characters like ß (does it convert to lowercase or check both upper and lower case?)
-        $_SESSION["register_error_message"] = "The password must not contain the username!\n";
+        $_SESSION[FLASH_MESSAGE_NAME] = "The password must not contain the username!\n";
         return false;
     }
     if (preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/", $passwordCandidate) === 0) {
-        $_SESSION["register_error_message"] = "The password must have at least 1 lowercase letter, 1 uppercase letter and 1 digit!\n";
+        $_SESSION[FLASH_MESSAGE_NAME] = "The password must have at least 1 lowercase letter, 1 uppercase letter and 1 digit!\n";
         return false;
     }
     return true;
@@ -30,16 +30,16 @@ function is_valid_password(string $passwordCandidate, string $name) {
 
 function register_user(PDO $dbh, string $name, string $passwordCandidate) {
     if ( empty($name) || empty($passwordCandidate)) {
-        $_SESSION["register_error_message"] = "Please enter a username and password!";
-        header("Location: /index.php");
+        $_SESSION[FLASH_MESSAGE_NAME] = "Please enter a username and password!";
+        header("Location: " . ERROR_REDIRECT_LOCATION);
         die();
     }
 
     // check if name is valid
     if (preg_match("/^(?=.{4,20}$)(?!.*[._-]{2})[a-zA-Z0-9._-]+$/", $name) === 0) {
-        $_SESSION["register_error_message"] = "The username must be at least 4 and at most 20
+        $_SESSION[FLASH_MESSAGE_NAME] = "The username must be at least 4 and at most 20
             characters long. It can contain special characters (.-_) but not two in a row!\n";
-        header("Location: /index.php");
+        header("Location: " . ERROR_REDIRECT_LOCATION);
         die();
     }
 
@@ -47,14 +47,14 @@ function register_user(PDO $dbh, string $name, string $passwordCandidate) {
     $stmt = $dbh->prepare("SELECT 1 FROM user WHERE name = :name;");
     $stmt->execute(array(":name" => $name));
     if ($stmt->fetchColumn()) {
-        $_SESSION["register_error_message"] = "This username is already taken!\n";
-        header("Location: /index.php");
+        $_SESSION[FLASH_MESSAGE_NAME] = "This username is already taken!\n";
+        header("Location: " . ERROR_REDIRECT_LOCATION);
         die();
     }
 
     // check if password is valid
     if (!is_valid_password($passwordCandidate, $name)) {
-        header("Location: /index.php");
+        header("Location: " . ERROR_REDIRECT_LOCATION);
         die();
     }
     
@@ -68,10 +68,12 @@ function register_user(PDO $dbh, string $name, string $passwordCandidate) {
     // header(calendar.php)
 }
 
+define("FLASH_MESSAGE_NAME", "register_error_message");
+define("ERROR_REDIRECT_LOCATION", "/index.php");
 session_start();
 if (isset($_SESSION["userid"])) {
-    $_SESSION["register_error_message"] = "You are already logged in!";
-    header("Location: /index.php");
+    $_SESSION[FLASH_MESSAGE_NAME] = "You are already logged in!";
+    header("Location: " . ERROR_REDIRECT_LOCATION);
     die();
 }
 register_user($dbh, $_POST["username"], $_POST["password"]);

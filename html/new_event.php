@@ -16,7 +16,7 @@
     $next_next_split = explode(" ", $datetime_next_next_hour);
     ?>
     <h2>New event</h2>
-    <form action="new_event.php" method="post">
+    <form action="create_event.php" method="post">
         <input type="text" name="name" placeholder="Event name" required autofocus /><br />
         <input type="text" name="location" placeholder="Location" required /><br />
         Start<br />
@@ -39,6 +39,9 @@
         </select><br />
         Put security question here later.<br />
         <input type="submit" name="submit" value="Submit!" />
-    </form>    
+    </form>
+    <?php
+    display_flash_message("create_event_error_message");
+    ?>
 </body>
 </html>
