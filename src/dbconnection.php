@@ -56,6 +56,7 @@ try {
     create_table_event($dbh);
     create_table_series($dbh);
 } catch (PDOException $e) {
+    // printing detailed error to user would be bad, change this later?
     die("Error!: " . $e->getMessage() . "<br/>");
 }
 
