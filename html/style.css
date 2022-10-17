@@ -5,3 +5,26 @@ body {
 .error {
     background-color: red;
 }
+
+.grid { 
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 10px, repeat(7, 1fr);
+    gap: 1px;
+    position: absolute;
+    top: 0;
+    left: 0; 
+    right: 0;
+    bottom: 0;
+    padding: 6px;
+}
+/* or maybe this for full size div*/
+/* https://dev.to/lennythedev/css-gotcha-how-to-fill-page-with-a-div-270j */
+
+.grid > div {
+    background-color: rgb(183, 243, 223);
+}
+
+.grid > div:hover {
+    background-color:aliceblue;
+}
