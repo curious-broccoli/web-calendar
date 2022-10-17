@@ -6,25 +6,37 @@ body {
     background-color: red;
 }
 
-.grid { 
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: 10px, repeat(7, 1fr);
-    gap: 1px;
+.calendar {
     position: absolute;
     top: 0;
     left: 0; 
     right: 0;
-    bottom: 0;
+    bottom: 0; 
     padding: 6px;
+}
+
+ol.day-header, ol.day-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-gap: 1px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+li {
+    list-style-type: none;
 }
 /* or maybe this for full size div*/
 /* https://dev.to/lennythedev/css-gotcha-how-to-fill-page-with-a-div-270j */
 
-.grid > div {
+ol.day-grid li {
     background-color: rgb(183, 243, 223);
 }
 
-.grid > div:hover {
+.day-grid > li:hover {
     background-color:aliceblue;
+}
+
+.day-header > li {
+    background-color: aqua;
 }

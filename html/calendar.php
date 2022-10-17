@@ -7,7 +7,8 @@
     <title>Calendar</title>
 </head>
 <body>
-    <div class="grid">
+    <div class="calendar">
+    <ol class="day-header">
     <?php
     require_once __DIR__ . "/../src/dbconnection.php";
 
@@ -31,9 +32,14 @@
     );
     // get name of all days depending on locale and timezone
     foreach ($weekdays as $key => $day) {?>
-        <div><?=datefmt_format($fmt, $day)?></div>
+        <li><?=datefmt_format($fmt, $day)?></li>    
     <?php
     }
+    ?>
+    </ol>
+    <ol class="day-grid">
+    <?php
+
 
     // do I need eventid?
     $sql = "SELECT name, description, datetime_start, datetime_end, location,
@@ -43,7 +49,7 @@
         ORDER BY datetime_start;";
     //foreach ($dbh->query($sql, PDO::FETCH_ASSOC) as $row) {
     for ($i=0; $i < 35; $i++) { ?>
-        <div><?=$i + 1?></div>    
+        <li><?=$i + 1?></li>
          <!-- <div><?=var_dump($row)?></div> -->
     <?php
     }
@@ -51,7 +57,7 @@
     # is leap year?
     # what day is the 1st of the month?
     ?>
-        
+    </ol>
     </div>
     
 </body>
