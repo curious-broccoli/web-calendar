@@ -11,9 +11,8 @@
     require_once __DIR__ . "/../src/dbconnection.php";
     define('LOCALE', 'en_US');
     define('TIMEZONE', 'Europe/London');    
-    // get date (day, month, year is probably needed)(later it can be set by user)
     // get selected datetime, everything but year and month stripped
-    // maybe try except around the date(), depends how the date is selected
+    //maybe try except around the date(), depends how the date is selected
     $selected_date = new DateTimeImmutable(date('o-m'));
     $date_formatter = new IntlDateFormatter(
         LOCALE,
@@ -53,13 +52,23 @@
     </ol>
     <ol class="day-grid">
     <?php
-    // here the number of needed columns should be minimum and not fixed
-    $total_days_displayed = 7 * 6;
     $number_of_days = intval($selected_date->format('t'));
     //$number_of_today = intval($selected_date->format('j'));
-    $first_day_on = intval($selected_date->format('N'));
+    $starts_on_weekday = intval($selected_date->format('N'));
+    // calculate required number of rows
+    $min_days_to_display = $starts_on_weekday + $number_of_days - 1;
+    if ($min_days_to_display == 28) {
+        $num_rows = 4;
+    }
+    elseif ($min_days_to_display <= 35) {
+        $num_rows = 5;
+    }
+    else {
+        $num_rows = 6;
+    }
+    $total_days_displayed = 7 * $num_rows;
     //for today coloring it will also need to check if month and year is the same
-    for ($i=0; $i < $first_day_on - 1; $i++) { 
+    for ($i=0; $i < $starts_on_weekday - 1; $i++) { 
         echo '<li class="month-prev">prev</li>';
     }
     for ($i=1; $i <= $number_of_days; $i++) {
@@ -69,7 +78,7 @@
         //     echo '<li id="today">' ,  $i , '</li>';
         // }       
     }
-    for ($i=$number_of_days + $first_day_on - 1; $i < $total_days_displayed; $i++) { 
+    for ($i=$number_of_days + $starts_on_weekday - 1; $i < $total_days_displayed; $i++) { 
         echo '<li class="month-next">next</li>';
     }
     
