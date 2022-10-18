@@ -20,10 +20,11 @@ function create_event(PDO $dbh, $start, $end, $series) {
         $approved_by = null;
     }
 
-    $stmt = $dbh->prepare("INSERT INTO event (name, description,
-        datetime_start, datetime_end, location, created_by, approval_state,
-        approved_by, event_series) VALUES
-        (:name, :description, :start, :end, :location, :created_by,
+    $stmt = $dbh->prepare("
+        INSERT INTO event (
+        name, description, datetime_start, datetime_end, location,
+        created_by, approval_state, approved_by, event_series) VALUES (
+        :name, :description, :start, :end, :location, :created_by,
         :approval_state, :approved_by, :series);");
     try {
         $stmt->execute(array(":name" => $_POST["name"], ":description" => $_POST["description"],
