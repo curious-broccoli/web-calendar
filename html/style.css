@@ -1,8 +1,9 @@
 :root {
     --base-day-color: rgb(183, 243, 223);
     --day-hover-color: var(--main-background-color);
-    --today-color: aqua;
-    --main-background-color: rgb(244, 244, 244);
+    --today-color: var(--calendar-header-color);
+    --main-background-color: #F2F2F2;
+    --calendar-header-color: aqua;
 }
 
 body {
@@ -49,7 +50,7 @@ li {
 }
 
 .day-header li {
-    background-color: aqua;
+    background-color: var(--calendar-header-color);
 }
 
 /* .day-grid li */

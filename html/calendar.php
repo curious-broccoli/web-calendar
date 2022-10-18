@@ -31,6 +31,7 @@
         echo $date_formatter->format($selected_date)
         ?>
     </div>
+
     <ol class="day-header">
     <?php
     // get name of all days
@@ -50,7 +51,8 @@
     }
     ?>
     </ol>
-    <ol class="day-grid">
+
+    <ol class="day-grid">        
     <?php
     $number_of_days = intval($selected_date->format('t'));
     //$number_of_today = intval($selected_date->format('j'));
@@ -67,16 +69,23 @@
         $num_rows = 6;
     }
     $total_days_displayed = 7 * $num_rows;
-    //for today coloring it will also need to check if month and year is the same
+
+    // for highlighting today in the calendar
+    $today = new DateTimeImmutable('now');
+    $today_string = $today->format('o-m-j');
+    $date_without_day_string = $selected_date->format('o-m-');
+    // display all days
     for ($i=0; $i < $starts_on_weekday - 1; $i++) { 
         echo '<li class="month-prev">prev</li>';
-    }
-    for ($i=1; $i <= $number_of_days; $i++) {
+    }    
+    for ($i=1; $i <= $number_of_days; $i++) {            
+        // if the day is today
+        if ($today_string == $date_without_day_string . $i) {
+            echo '<li id="today">' ,  $i , '</li>';
+        }
+        else {
             echo '<li>' , $i , '</li>';
-        
-        // if ($i == $number_of_today) {
-        //     echo '<li id="today">' ,  $i , '</li>';
-        // }       
+        }
     }
     for ($i=$number_of_days + $starts_on_weekday - 1; $i < $total_days_displayed; $i++) { 
         echo '<li class="month-next">next</li>';
