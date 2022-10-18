@@ -1,7 +1,15 @@
+:root {
+    --base-day-color: rgb(183, 243, 223);
+    --day-hover-color: var(--main-background-color);
+    --today-color: aqua;
+    --main-background-color: rgb(244, 244, 244);
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: sans-serif;
+    background-color: var(--main-background-color);
 }
 
 .error {
@@ -40,16 +48,27 @@ li {
     list-style-type: none;
 }
 
-.day-header > li {
+.day-header li {
     background-color: aqua;
 }
 
-ol.day-grid li {
-    background-color: rgb(183, 243, 223);
+/* .day-grid li */
+li {
+    background-color: var(--base-day-color);
 }
 
-.day-grid > li:hover {
-    background-color:aliceblue;
+.month-prev,
+.month-next {
+    background-color: lightgrey;
+}
+
+#today {
+    background-color: var(--today-color);
+}
+
+.day-grid li:hover,
+#today:hover {
+    background-color: var(--day-hover-color);
 }
 
 .calendar-header {
