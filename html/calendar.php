@@ -8,6 +8,7 @@
 </head>
 <body>
     <div class="calendar">
+    <div class="calendar-header">Oktober 2017</div>
     <ol class="day-header">
     <?php
     require_once __DIR__ . "/../src/dbconnection.php";
@@ -21,7 +22,6 @@
         'fri' => $seconds_in_day,
         'sat' => 2 * $seconds_in_day,
         'sun' => 3 * $seconds_in_day);
-
     $fmt = datefmt_create(
         'en_US',
         IntlDateFormatter::FULL,
@@ -40,7 +40,7 @@
     <ol class="day-grid">
     <?php
 
-
+    // get events for current view
     // do I need eventid?
     $sql = "SELECT name, description, datetime_start, datetime_end, location,
         created_by, approved_by, event_series
@@ -54,8 +54,8 @@
     <?php
     }
 
-    # is leap year?
-    # what day is the 1st of the month?
+    # first day is what weekday
+    # how many days
     ?>
     </ol>
     </div>
