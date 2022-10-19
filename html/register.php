@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar/register</title>
-</head>
-<body>
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
 require_once __DIR__ . "/../src/flash_message.php";
@@ -73,8 +65,4 @@ if (isset($_SESSION["userid"])) {
 register_user($dbh, $_POST["username"], $_POST["password"]);
 
 
-
 ?>
-
-</body>
-</html>
