@@ -1,5 +1,5 @@
 :root {
-    --base-day-color: rgb(183, 243, 223);
+    --base-day-color: rgb(201, 237, 225);
     --day-hover-color: var(--main-background-color);
     --today-color: var(--calendar-header-color);
     --main-background-color: #F2F2F2;
@@ -61,6 +61,7 @@ li {
 .month-prev,
 .month-next {
     background-color: lightgrey;
+    opacity: 0.8;
 }
 
 #today {
@@ -74,4 +75,5 @@ li {
 
 .calendar-header {
     display:flex;
+    font-weight: bold;
 }

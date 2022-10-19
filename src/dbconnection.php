@@ -36,7 +36,7 @@ function create_table_series(PDO $dbh) {
 function insert_guest_user(PDO $dbh) {
     $userid = 1;
     $name = "guest";
-    // this should prevent anyone from logging in as user
+    // this should prevent anyone from logging in as user 'guest'
     $hash = "ßßßßßßßßßßßßßßßßßßßßßßß";
     try {
         $dbh->query("INSERT INTO user (userid, name, hash) VALUES (

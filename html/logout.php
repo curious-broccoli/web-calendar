@@ -7,13 +7,13 @@
 </head>
 <body>
     
-<?php
+    <?php
 
-session_start();
-unset($_SESSION["userid"]);
-header("Location: /index.php");
+    session_start();
+    unset($_SESSION["userid"]);
+    header("Location: /index.php");
 
-?>
+    ?>
 
 </body>
 </html>
