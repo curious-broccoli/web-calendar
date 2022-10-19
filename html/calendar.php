@@ -79,7 +79,7 @@ for ($i=1; $i <= $number_of_days; $i++) {
     if ($today_string == $date_without_day_string . $i) {
         $id_if_today = ' id="today"';
     }?>
-    <li <?=$id_if_today . '>' . $i?></li>
+    <li <?=$id_if_today?>><?=$i?></li>
 <?php
 }
 for ($i=$number_of_days + $starts_on_weekday - 1; $i < $total_days_displayed; $i++) {?>
