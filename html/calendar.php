@@ -69,20 +69,22 @@ $today = new DateTimeImmutable('now');
 $today_string = $today->format('o-m-j');
 $date_without_day_string = $selected_date->format('o-m-');
 // display all days
-for ($i=0; $i < $starts_on_weekday - 1; $i++) { 
-    echo '<li class="month-prev">prev</li>';
-}    
-for ($i=1; $i <= $number_of_days; $i++) {            
-    // if the day is today
-    if ($today_string == $date_without_day_string . $i) {
-        echo '<li id="today">' ,  $i , '</li>';
-    }
-    else {
-        echo '<li>' , $i , '</li>';
-    }
+for ($i=0; $i < $starts_on_weekday - 1; $i++) {?>
+    <li class="month-prev">prev</li>
+<?php
 }
-for ($i=$number_of_days + $starts_on_weekday - 1; $i < $total_days_displayed; $i++) { 
-    echo '<li class="month-next">next</li>';
+for ($i=1; $i <= $number_of_days; $i++) {            
+    $id_if_today = '';
+    // if the day is today set the id
+    if ($today_string == $date_without_day_string . $i) {
+        $id_if_today = ' id="today"';
+    }?>
+    <li <?=$id_if_today . '>' . $i?></li>
+<?php
+}
+for ($i=$number_of_days + $starts_on_weekday - 1; $i < $total_days_displayed; $i++) {?>
+    <li class="month-next">next</li>
+<?php
 }
 
 // get events for current view
