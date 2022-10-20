@@ -3,6 +3,10 @@ $title = 'Calendar login';
 include __DIR__ . "/../src/top.php";
 require_once __DIR__ . "/../src/flash_message.php";
 session_start();
+if (isset($_SESSION["userid"])) {?>
+    <span>logged in with userid <?=$_SESSION["userid"]?></span>
+<?php
+}
 ?>
 
 <h2>Login</h2>
