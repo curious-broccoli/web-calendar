@@ -2,6 +2,9 @@
 $title = 'Calendar';
 include __DIR__ . "/../src/top.php";
 require_once __DIR__ . "/../src/dbconnection.php";
+?>
+<script src="calendar.js"></script>
+<?php
 
 define('LOCALE', 'en_US');
 define('TIMEZONE', 'Europe/London');    
