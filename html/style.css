@@ -29,7 +29,7 @@ body {
 }
 
 /* https://dev.to/lennythedev/css-gotcha-how-to-fill-page-with-a-div-270j */
-ol.day-header, ol.day-grid {
+ol.grid-header, ol.grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-gap: 1px;
@@ -37,7 +37,7 @@ ol.day-header, ol.day-grid {
     padding: 0;    
 }
 
-ol.day-grid {
+ol.grid {
     height: 100%;
 }
 
@@ -49,11 +49,11 @@ li {
     list-style-type: none;
 }
 
-.day-header li {
+.grid-header li {
     background-color: var(--calendar-header-color);
 }
 
-/* .day-grid li */
+/* .grid li */
 li {
     background-color: var(--base-day-color);
 }
@@ -67,7 +67,7 @@ li {
     background-color: var(--today-color);
 }
 
-.day-grid li:hover,
+.grid li:hover,
 #today:hover {
     background-color: var(--day-hover-color);
 }

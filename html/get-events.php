@@ -2,7 +2,7 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
 
-// change this to be all events from past two month till all events in one year
+// change this to be all events from past two month from selected date till all events in one year
 $sql = "SELECT name, description, datetime_start, datetime_end, location,
     created_by, approved_by, event_series
     FROM event
