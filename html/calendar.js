@@ -87,6 +87,14 @@ class MonthView extends View {
         }
     }
 
+    // does it handle timezone properly?
+    #isToday(today, day_number) {
+        //the 3 conditions should be sorted by the highest chance to fail first
+        return today.getDate() === day_number &&
+            today.getMonth() === this.selectedDate.getMonth() &&
+            today.getFullYear() === this.selectedDate.getFullYear();
+    }
+
     drawGrid() {
         const numberOfDays = this.selectedDate.getDaysInMonth();
         // Monday - Sunday : 0 - 6
@@ -110,15 +118,21 @@ class MonthView extends View {
         })();
         
         const grid = document.querySelector(".grid");
-        this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev");
-        //must check for today here
+        this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev");        
+
+        const today = new Date();
+        console.log(today);
         for (let i = 1; i <= numberOfDays; i++) {
             const day = document.createElement("li");
+            if (this.#isToday(today, i)) {
+                day.setAttribute("id", "today");    
+            }            
             const span = document.createElement("span");
             span.textContent = i;
             day.appendChild(span);
             grid.appendChild(day);
         }
+
         this.#drawOtherDays(grid, numberOfDays + firstDayOn, totalDaysShown, "month-next", "next");
     }
 }
