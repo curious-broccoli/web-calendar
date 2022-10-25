@@ -46,6 +46,10 @@ function valid_date(string $date, string $format)
     return $d && $d->format($format) === $date;
 }
 
+function combine_datetime(string $date, string $time) {
+    return $date . "T" . $time . ":00.000Z" ;
+}
+
 // maybe rename function
 function validate($dbh) {
     $required_string_data = array("name", "location", "date_start", "time_start", "date_end", "time_end");
@@ -54,10 +58,12 @@ function validate($dbh) {
             error_and_redirect("Please enter a value for the event name, location, start and end!");
         }          
     }
+    //SOMEWHERE I MAY HAVE TO CONVERT TO UTC LATER
 
-    $datetime_format = "Y-m-d H:i";
-    $datetime_start = $_POST["date_start"] . " " . $_POST["time_start"];
-    $datetime_end = $_POST["date_end"] . " " . $_POST["time_end"];
+    // 2022-10-25T14:16:00.000Z
+    $datetime_format = "Y-m-d\TH:i:00.000\Z";
+    $datetime_start = combine_datetime($_POST["date_start"], $_POST["time_start"]);
+    $datetime_end = combine_datetime($_POST["date_end"], $_POST["time_end"]);
     if (!valid_date($datetime_start, $datetime_format)) {
         error_and_redirect("Please enter a valid start date and time!");
     }
