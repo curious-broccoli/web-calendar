@@ -63,7 +63,8 @@ li {
     background-color: rgb(226, 225, 225);
 }
 
-#today {
+#today span {
+    display: block;
     background-color: var(--today-color);
 }
 
@@ -79,4 +80,5 @@ li {
 
 .event {
     background-color: aqua;
+    margin: 3px;
 }
