@@ -1,9 +1,9 @@
 :root {
-    --base-day-color: var(--main-background-color);
     --day-hover-color: rgb(240, 240, 207);
     --today-color: rgb(0, 140, 255);
     --main-background-color: #F2F2F2;
     --calendar-header-color: aqua;
+    --gap--color: #696767;
 }
 
 body {
@@ -49,13 +49,13 @@ li {
     list-style-type: none;
 }
 
+/* .grid-header,
+.grid {
+    background-color: var(--gap--color);
+} */
+
 .grid-header li {
     background-color: var(--calendar-header-color);
-}
-
-/* .grid li */
-li {
-    background-color: var(--base-day-color);
 }
 
 .month-prev,
