@@ -71,6 +71,7 @@ function validate($dbh) {
         error_and_redirect("Please enter a valid end date and time!");
     }
     $now = date($datetime_format);
+    // does this comparison work with a date coming from a later timezone?
     if ($datetime_start <= $now) {
         error_and_redirect("The start date and time must be set in the future!");
     }

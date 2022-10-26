@@ -2,6 +2,7 @@ function reqListener () {
     sessionStorage.setItem("events", this.responseText);
 }
 
+//EVENTS SHOULD ONLY BE REQUESTED THE FIRST TIME AND ON EXPLICIT REFRESH REQUEST IN GUI
 //should only get from past two and next 12 months
 const req = new XMLHttpRequest();
 req.addEventListener("load", reqListener);
@@ -14,12 +15,14 @@ const getEvents = () => {
     if(sessionStorage.getItem("events") === null){
         events = [];
     }else {
-        events = JSON.parse(sessionStorage.getItem("events"));
+        events = JSON.parse(sessionStorage.getItem("events"), (key, value) => 
+            key === "datetime_end" || key === "datetime_start"
+            ? new Date(value)
+            : value
+        );
     }
     return events;
-
 }
-getEvents();
 
 Date.prototype.getDaysInMonth = function () {
     // getting day 0 of next month gives the last day of current month
@@ -87,12 +90,25 @@ class MonthView extends View {
         }
     }
 
-    // does it handle timezone properly?
-    #isToday(today, day_number) {
+    //can timezones cause problems here? (for checking if it is today)
+    #isSameDay(date, day_number) {
         //the 3 conditions should be sorted by the highest chance to fail first
-        return today.getDate() === day_number &&
-            today.getMonth() === this.selectedDate.getMonth() &&
-            today.getFullYear() === this.selectedDate.getFullYear();
+        return date.getDate() === day_number &&
+            date.getMonth() === this.selectedDate.getMonth() &&
+            date.getFullYear() === this.selectedDate.getFullYear();
+    }
+
+    #getEventsForDay(events, day_number) {
+        return events.filter((e) => this.#isSameDay(e.datetime_start, day_number))            
+    }
+
+    #createEventElement(e) {
+        const div = document.createElement("div");
+        div.setAttribute("class", "event");
+        const locale = navigator.language;
+        const options = { timeStyle: "short" };
+        div.textContent = e.datetime_start.toLocaleTimeString(locale, options) + " " + e.name;
+        return div;
     }
 
     drawGrid() {
@@ -118,18 +134,20 @@ class MonthView extends View {
         })();
         
         const grid = document.querySelector(".grid");
-        this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev");        
-
+        this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev"); 
         const today = new Date();
-        console.log(today);
+        const events = getEvents();
+        console.log(events);
         for (let i = 1; i <= numberOfDays; i++) {
             const day = document.createElement("li");
-            if (this.#isToday(today, i)) {
-                day.setAttribute("id", "today");    
-            }            
+            if (this.#isSameDay(today, i)) {
+                day.setAttribute("id", "today");
+            }
             const span = document.createElement("span");
             span.textContent = i;
             day.appendChild(span);
+            const events_today = this.#getEventsForDay(events, i)
+            events_today.forEach((e) => day.appendChild(this.#createEventElement(e)));
             grid.appendChild(day);
         }
 
