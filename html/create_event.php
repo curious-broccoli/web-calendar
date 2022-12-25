@@ -46,43 +46,35 @@ function valid_date(string $date, string $format)
     return $d && $d->format($format) === $date;
 }
 
-function combine_datetime(string $date, string $time) {
-    return $date . "T" . $time . ":00.000Z" ;
-}
-
 // maybe rename function
 function validate($dbh) {
-    $required_string_data = array("name", "location", "date_start", "time_start", "date_end", "time_end");
+    $required_string_data = array("name", "location", "datetime_start", "datetime_end");
     foreach ($required_string_data as $str) {
-        if (empty($str)) {
+        if (empty($_POST[$str])) {
             error_and_redirect("Please enter a value for the event name, location, start and end!");
         }          
     }
-    //SOMEWHERE I MAY HAVE TO CONVERT TO UTC LATER
 
-    // 2022-10-25T14:16:00.000Z
-    $datetime_format = "Y-m-d\TH:i:00.000\Z";
-    $datetime_start = combine_datetime($_POST["date_start"], $_POST["time_start"]);
-    $datetime_end = combine_datetime($_POST["date_end"], $_POST["time_end"]);
+    // seconds and milliseconds are expected to be 0
+    // e.g. 2022-10-25T14:16:00.000Z
+    $datetime_format = "Y-m-d\TH:i:00.000\Z"; 
+    $datetime_start = $_POST["datetime_start"];
+    $datetime_end = $_POST["datetime_end"];
     if (!valid_date($datetime_start, $datetime_format)) {
         error_and_redirect("Please enter a valid start date and time!");
     }
     if (!valid_date($datetime_end, $datetime_format)) {
         error_and_redirect("Please enter a valid end date and time!");
     }
-    $now = date($datetime_format);
-    // does this comparison work with a date coming from a later timezone?
-    if ($datetime_start <= $now) {
-        error_and_redirect("The start date and time must be set in the future!");
-    }
-    if ($datetime_end <= $datetime_start) {
-        error_and_redirect("The end date and time must be after the start!");
+    //maybe set end = start instead of returning error
+    if ($datetime_end < $datetime_start) {
+        error_and_redirect("The end date and time must not be before the start!");
     }
 
     if (empty($_POST["series"])) {
         $series = null;
     }
-    // maybe also check if int is a valid seriesid in the db
+    //maybe also check if int is a valid seriesid in the db
     elseif (is_numeric($_POST["series"])) {
         $series = intval($_POST["series"]);
     }
