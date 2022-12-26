@@ -46,7 +46,7 @@ function valid_date(string $date, string $format)
     return $d && $d->format($format) === $date;
 }
 
-// maybe rename function
+// probably rename and maybe split function
 function validate($dbh) {
     $required_string_data = array("name", "location", "datetime_start", "datetime_end");
     foreach ($required_string_data as $str) {
@@ -66,9 +66,8 @@ function validate($dbh) {
     if (!valid_date($datetime_end, $datetime_format)) {
         error_and_redirect("Please enter a valid end date and time!");
     }
-    //maybe set end = start instead of returning error
     if ($datetime_end < $datetime_start) {
-        error_and_redirect("The end date and time must not be before the start!");
+        $datetime_end = $datetime_start;
     }
 
     if (empty($_POST["series"])) {
