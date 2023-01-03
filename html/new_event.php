@@ -1,9 +1,7 @@
 <?php
-$title = 'Create new event';
+$title = "Create new event";
+$my_script = "form_timezone.js";
 include __DIR__ . "/../src/top.php";
-?>
-<script src="form_timezone.js"></script>
-<?php
 require_once __DIR__ . "/../src/flash_message.php";
 require_once __DIR__ . "/../src/dbconnection.php";
 session_start();
