@@ -10,7 +10,8 @@ $today = date($format, strtotime("now"));
 
 <div class="calendar">
     <div class="calendar-header">
-        <input type="date" id="date-picker" name="selected_date" value="<?=$today?>" min="2000-01-01">
+        <div id="calendar-header-text"></div>
+        <input type="date" id="date-picker" value="<?=$today?>" min="2000-01-01">
     </div>
     <ol class="grid-header">
     </ol>

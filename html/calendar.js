@@ -134,8 +134,8 @@ class MonthView extends View {
     drawCalendarHeader() {
         const locale = navigator.language;
         const options = { month: "long", year: "numeric" };
-        const header = document.querySelector("." + View.calendarHeader);
-        header.insertAdjacentText("afterbegin", this.selectedDate.toLocaleDateString(locale, options));
+        const headerText = document.querySelector("#calendar-header-text");
+        headerText.textContent = this.selectedDate.toLocaleDateString(locale, options);
     }
 
     drawGridHeader() {
