@@ -82,3 +82,16 @@ li {
     background-color: aqua;
     margin: 3px;
 }
+
+/* POPOVER */
+.popover-grid {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    margin: 0 auto;
+    padding: 0;
+}
+
+li.popover-data-left {
+    text-align: right;
+    margin-right: 6px;
+}

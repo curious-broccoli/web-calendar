@@ -51,6 +51,7 @@ function handleTimezones() {
         // and prevent the local time field values from being submitted
         // because they aren't needed
         // but it flashes new input fields for a short time before being submitted (ugly)
+        // maybe disable something instead? disabled will not be submitted
         form.replaceChild(start, dateStart);
         timeStart.remove();
         form.replaceChild(end, dateEnd);

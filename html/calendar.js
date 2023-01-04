@@ -10,6 +10,8 @@ req.addEventListener("load", reqListener);
 req.open("GET", "get-events.php", true);
 req.send();
 
+// maybe I should make a map with database index as key instead of an array
+// for getting all the details for the event pop-overs
 const getEvents = () => {
     let events;
     if(sessionStorage.getItem("events") === null){
@@ -23,6 +25,76 @@ const getEvents = () => {
     }
     return events;
 }
+
+function createListElement(value, classList = []) {
+    const li = document.createElement("li");
+    if (classList.length > 0) {
+        li.classList.add(...classList);    
+    }
+    li.textContent = value;
+    return li;
+}
+
+function formatDate(dateString) {
+    // for display in popover
+    const date = new Date(dateString);
+    const options = {
+        dateStyle: "full",
+        timeStyle: "short"
+    };
+    const locale = navigator.language;
+    return date.toLocaleString(locale, options);
+}
+
+function getEventById(eventid) {
+    const events = getEvents();
+    return events.find((element) => element.eventid === eventid);
+}
+
+// is JQuery necessary or does vanilla work for popover() ?
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover({
+        title: function() {
+            const event = getEventById(+this.dataset.eventid);
+            return event.name;
+        },
+        html: true,
+        placement: "auto",
+        trigger: "click",
+        content: function () {
+            // getEvents() is called everytime a popover is shown
+            // once for title, once for content
+            // can I reduce the number of calls?
+            const event = getEventById(+this.dataset.eventid);
+            const data = {
+                name: {
+                    label: "Title", value: event.name
+                },
+                start: {
+                    label: "Start", value: formatDate(event.datetime_start)
+                },
+                end: {
+                    label: "End", value: formatDate(event.datetime_end)
+                },
+                location: {
+                    label: "Location", value: event.location
+                },
+                description: {
+                    label: "Description", value: event.description
+                }
+            };
+            const list = document.createElement("ol");
+            list.className = "popover-grid";
+            Object.values(data).forEach(pair => {
+                const label = createListElement(pair.label + ":", ["popover-data-left"]);
+                list.appendChild(label);
+                const value = createListElement(pair.value, ["popover-data-right"]);
+                list.appendChild(value);
+            })
+            return list;
+        },
+    });
+});
 
 Date.prototype.getDaysInMonth = function () {
     // getting day 0 of next month gives the last day of current month
@@ -105,6 +177,8 @@ class MonthView extends View {
     #createEventElement(e) {
         const div = document.createElement("div");
         div.setAttribute("class", "event");
+        div.setAttribute("data-eventid", e.eventid);
+        div.setAttribute("data-toggle", "popover");
         const locale = navigator.language;
         const options = { timeStyle: "short" };
         div.textContent = e.datetime_start.toLocaleTimeString(locale, options) + " " + e.name;
@@ -137,7 +211,6 @@ class MonthView extends View {
         this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev"); 
         const today = new Date();
         const events = getEvents();
-        console.log(events);
         for (let i = 1; i <= numberOfDays; i++) {
             const day = document.createElement("li");
             if (this.#isSameDay(today, i)) {
