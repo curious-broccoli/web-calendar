@@ -51,7 +51,12 @@ function getEventById(eventid) {
     return events.find((element) => element.eventid === eventid);
 }
 
-// is JQuery necessary or does vanilla work for popover() ?
+// current problems:
+// XSS vulnerable
+// trigger: click means you have to press on the trigger element again to close it and multiple popovers can be opened
+// trigger: focus means you clicking in the popover closes it (bad, probably)
+// -> read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
+
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover({
         title: function() {
@@ -126,7 +131,6 @@ class View {
 
 // maybe getLocale function?
 class MonthView extends View {
-    #property;
     drawCalendarHeader() {
         const locale = navigator.language;
         const options = { month: "long", year: "numeric" };
