@@ -10,7 +10,7 @@ req.addEventListener("load", reqListener);
 req.open("GET", "get-events.php", true);
 req.send();
 
-// maybe I should make a map with database index as key instead of an array
+// make a map/dict with database index as key instead of an array
 // for getting all the details for the event pop-overs
 const getEvents = () => {
     let events;
@@ -26,10 +26,13 @@ const getEvents = () => {
     return events;
 }
 
+// I would put the 3 functions below for popovers in the View class but
+// they would have to be called with this and this points to the html element
+// for the popover
 function createListElement(value, classList = []) {
     const li = document.createElement("li");
     if (classList.length > 0) {
-        li.classList.add(...classList);    
+        li.classList.add(...classList);
     }
     li.textContent = value;
     return li;
@@ -51,57 +54,6 @@ function getEventById(eventid) {
     return events.find((element) => element.eventid === eventid);
 }
 
-// current problems:
-// XSS vulnerable
-// if you change month after showing a popover the popover won't close anymore
-// trigger: click means you have to press on the trigger element again to close it and multiple popovers can be opened
-// trigger: focus means you clicking in the popover closes it (bad, probably)
-// -> read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
-
-// problem: if the view is changed without F5 after, document.ready isn't triggered
-$(document).ready(function () {
-    $('[data-toggle="popover"]').popover({
-        title: function() {
-            const event = getEventById(+this.dataset.eventid);
-            return event.name;
-        },
-        html: true,
-        placement: "auto",
-        trigger: "click",
-        content: function () {
-            // getEvents() is called everytime a popover is shown
-            // once for title, once for content
-            // can I reduce the number of calls?
-            const event = getEventById(+this.dataset.eventid);
-            const data = {
-                name: {
-                    label: "Title", value: event.name
-                },
-                start: {
-                    label: "Start", value: formatDate(event.datetime_start)
-                },
-                end: {
-                    label: "End", value: formatDate(event.datetime_end)
-                },
-                location: {
-                    label: "Location", value: event.location
-                },
-                description: {
-                    label: "Description", value: event.description
-                }
-            };
-            const list = document.createElement("ol");
-            list.className = "popover-grid";
-            Object.values(data).forEach(pair => {
-                const label = createListElement(pair.label + ":", ["popover-data-left"]);
-                list.appendChild(label);
-                const value = createListElement(pair.value, ["popover-data-right"]);
-                list.appendChild(value);
-            })
-            return list;
-        },
-    });
-});
 
 Date.prototype.getDaysInMonth = function () {
     // getting day 0 of next month gives the last day of current month
@@ -255,6 +207,56 @@ class MonthView extends View {
 
         this.#drawOtherDays(grid, numberOfDays + firstDayOn, totalDaysShown, "month-next", "next");
     }
+
+    // current problems:
+    // XSS vulnerable
+    // if you change month after showing a popover the popover won't close anymore
+    // trigger: click means you have to press on the trigger element again to close it and multiple popovers can be opened
+    // trigger: focus means you clicking in the popover closes it (bad, probably)
+    // -> read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
+    makePopovers() {
+        $('[data-toggle="popover"]').popover({
+            title: function () {
+                const event = getEventById(+this.dataset.eventid);
+                return event.name;
+            },
+            html: true,
+            placement: "auto",
+            trigger: "click",
+            content: function () {                
+                // getEvents() is called everytime a popover is shown
+                // once for title, once for content
+                // can I reduce the number of calls?
+                const event = getEventById(+this.dataset.eventid);
+                const data = {
+                    name: {
+                        label: "Title", value: event.name
+                    },
+                    start: {
+                        label: "Start", value: formatDate(event.datetime_start)
+                    },
+                    end: {
+                        label: "End", value: formatDate(event.datetime_end)
+                    },
+                    location: {
+                        label: "Location", value: event.location
+                    },
+                    description: {
+                        label: "Description", value: event.description
+                    }
+                };
+                const list = document.createElement("ol");
+                list.className = "popover-grid";
+                Object.values(data).forEach(pair => {
+                    const label = createListElement(pair.label + ":", ["popover-data-left"]);
+                    list.appendChild(label);
+                    const value = createListElement(pair.value, ["popover-data-right"]);
+                    list.appendChild(value);
+                })
+                return list;
+            },
+        });
+    }
 }
 
 function draw() {
@@ -263,8 +265,9 @@ function draw() {
     //must check if it is valid date (some browsers might default to text input), else maybe set as today
     const v = new MonthView(datePicker.value);
     v.drawCalendarHeader();
-    v.drawGridHeader();    
-    v.drawGrid();    
+    v.drawGridHeader();
+    v.drawGrid();
+    v.makePopovers();
 }
 
 if (document.readyState === "loading") {  // Loading hasn't finished yet
