@@ -53,10 +53,12 @@ function getEventById(eventid) {
 
 // current problems:
 // XSS vulnerable
+// if you change month after showing a popover the popover won't close anymore
 // trigger: click means you have to press on the trigger element again to close it and multiple popovers can be opened
 // trigger: focus means you clicking in the popover closes it (bad, probably)
 // -> read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
 
+// problem: if the view is changed without F5 after, document.ready isn't triggered
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover({
         title: function() {
@@ -136,6 +138,29 @@ class MonthView extends View {
         const options = { month: "long", year: "numeric" };
         const headerText = document.querySelector("#calendar-header-text");
         headerText.textContent = this.selectedDate.toLocaleDateString(locale, options);
+
+        const leftButton = document.querySelector("#date-arrow-left");
+        leftButton.addEventListener("click", this.#changeDate);
+        const rightButton = document.querySelector("#date-arrow-right");
+        rightButton.addEventListener("click", this.#changeDate);
+    }
+
+    #changeDate(e) {
+        const datePicker = document.querySelector("#date-picker");
+        // selectedDate is local timezone
+        const selectedDate = new Date(datePicker.value + "T00:00");
+        // number determines if it will decrement or increment
+        let number = -1;
+        if (e.currentTarget.id == "date-arrow-right") {
+            number = 1;
+        }
+        // setting the 2nd argument of setMonth() to 1 seems to prevent problems
+        selectedDate.setMonth(selectedDate.getMonth() + number, 1);
+        // Swedish locale easily sets it to the ISO 8601 format
+        // which is used by the "date" input element
+        const locale = "sv";
+        datePicker.value = selectedDate.toLocaleDateString(locale);
+        draw();
     }
 
     drawGridHeader() {
