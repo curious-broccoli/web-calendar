@@ -91,6 +91,10 @@ li {
     padding: 0;
 }
 
+.popover-body {
+    overflow-wrap: anywhere;
+}
+
 li.popover-data-left {
     text-align: right;
     margin-right: 6px;

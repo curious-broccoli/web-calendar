@@ -26,15 +26,22 @@ const getEvents = () => {
     return events;
 }
 
-// I would put the 3 functions below for popovers in the View class but
+// I would put the functions below for popovers in the View class but
 // they would have to be called with this and this points to the html element
-// for the popover
-function createListElement(value, classList = []) {
+// for the popover instead
+function createListElement(value, classList = [], allowHtml = false) {
     const li = document.createElement("li");
     if (classList.length > 0) {
         li.classList.add(...classList);
     }
-    li.textContent = value;
+    if (allowHtml) {
+        // to have HTML except malicious and <img> in description
+        const sanitizeOptions = {USE_PROFILES: {html: true}, FORBID_TAGS: ["img"]};
+        li.innerHTML = DOMPurify.sanitize(value, sanitizeOptions);
+    }
+    else {
+        li.textContent = value;
+    }
     return li;
 }
 
@@ -208,49 +215,46 @@ class MonthView extends View {
         this.#drawOtherDays(grid, numberOfDays + firstDayOn, totalDaysShown, "month-next", "next");
     }
 
-    // current problems:
-    // XSS vulnerable
-    // if you change month after showing a popover the popover won't close anymore
     // trigger: click means you have to press on the trigger element again to close it and multiple popovers can be opened
     // trigger: focus means you clicking in the popover closes it (bad, probably)
     // -> read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
     makePopovers() {
         $('[data-toggle="popover"]').popover({
-            title: function () {
-                const event = getEventById(+this.dataset.eventid);
-                return event.name;
-            },
             html: true,
             placement: "auto",
             trigger: "click",
-            content: function () {                
-                // getEvents() is called everytime a popover is shown
-                // once for title, once for content
-                // can I reduce the number of calls?
+            title: function () {
+                const event = getEventById(+this.dataset.eventid);
+                const text = document.createTextNode(event.name);
+                return text;
+            },
+            content: function () {
                 const event = getEventById(+this.dataset.eventid);
                 const data = {
                     name: {
-                        label: "Title", value: event.name
+                        label: "Title", value: event.name, allowHtml: false
                     },
                     start: {
-                        label: "Start", value: formatDate(event.datetime_start)
+                        label: "Start", value: formatDate(event.datetime_start), allowHtml: false
                     },
                     end: {
-                        label: "End", value: formatDate(event.datetime_end)
+                        label: "End", value: formatDate(event.datetime_end), allowHtml: false
                     },
                     location: {
-                        label: "Location", value: event.location
+                        label: "Location", value: event.location, allowHtml: false
                     },
                     description: {
-                        label: "Description", value: event.description
+                        label: "Description", value: event.description, allowHtml: true
                     }
                 };
                 const list = document.createElement("ol");
                 list.className = "popover-grid";
-                Object.values(data).forEach(pair => {
-                    const label = createListElement(pair.label + ":", ["popover-data-left"]);
+                Object.values(data).forEach(property => {
+                    // the label should never be HTML data so I do not pass in
+                    // the allowHtml argument
+                    const label = createListElement(property.label + ":", ["popover-data-left"]);
                     list.appendChild(label);
-                    const value = createListElement(pair.value, ["popover-data-right"]);
+                    const value = createListElement(property.value, ["popover-data-right"], property.allowHtml);
                     list.appendChild(value);
                 })
                 return list;
