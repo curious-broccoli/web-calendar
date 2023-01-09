@@ -29,32 +29,47 @@ body {
 }
 
 /* https://dev.to/lennythedev/css-gotcha-how-to-fill-page-with-a-div-270j */
-ol.grid-header, ol.grid {
+ol.calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-gap: 1px;
     margin: 0 auto;
-    padding: 0;    
+    padding: 0;
+    height: 100%;
 }
 
-ol.grid {
-    height: 100%;
+/* because attr() doesn't really work*/
+ol.calendar-grid[grid-rows="4"] {
+    grid-template-rows: auto repeat(4, 1fr);
+}
+
+ol.calendar-grid[grid-rows="5"] {
+    grid-template-rows: auto repeat(5, 1fr);
+}
+
+ol.calendar-grid[grid-rows="6"] {
+    grid-template-rows: auto repeat(6, 1fr);
+}
+
+li.grid-content {
+    overflow-y: hidden;
+}
+
+div.event-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 85%; /* kinda a hack to mostly fix the weird scroll */
 }
 
 .first-day {
     grid-column-start: 2;
 }
 
-li {
+.calendar-grid, .popover li {
     list-style-type: none;
 }
 
-/* .grid-header,
-.grid {
-    background-color: var(--gap--color);
-} */
-
-.grid-header li {
+li.grid-header {
     background-color: var(--calendar-header-color);
 }
 
@@ -63,14 +78,13 @@ li {
     background-color: rgb(226, 225, 225);
 }
 
+.calendar-grid li:hover {
+    background-color: var(--day-hover-color);
+}
+
 #today span {
     display: block;
     background-color: var(--today-color);
-}
-
-.grid li:hover,
-#today:hover {
-    background-color: var(--day-hover-color);
 }
 
 .calendar-header {

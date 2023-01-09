@@ -9,15 +9,13 @@ $today = date($format, strtotime("now"));
 ?>
 
 <div class="calendar">
-    <div class="calendar-header">
+    <div id="calendar-header" class="calendar-header">
         <button class="date-picker-arrow" id="date-arrow-left" type="button"><</button>
         <button class="date-picker-arrow" id="date-arrow-right" type="button">></button>
         <input type="date" id="date-picker" value="<?=$today?>" min="2000-01-01">
         <div id="calendar-header-text"></div>
     </div>
-    <ol class="grid-header">
-    </ol>
-    <ol class="grid">
+    <ol id="calendar-grid" class="calendar-grid">
     </ol>
 </div>
 

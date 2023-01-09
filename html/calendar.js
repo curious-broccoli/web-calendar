@@ -69,10 +69,12 @@ Date.prototype.getDaysInMonth = function () {
 }
 
 class View {
-    // names of the html classes for the main sections
+    // class names and ids of the html classes for the main sections
+    // can be class name and id at the same time
     static calendarHeader = "calendar-header";
+    static calendarGrid = "calendar-grid";
     static gridHeader = "grid-header";
-    static grid = "grid";
+    static gridContent = "grid-content";
 
     constructor(date) {
         this.selectedDate = new Date(date + "T00:00:00.000Z");
@@ -80,17 +82,11 @@ class View {
 
     // remove all elements that are added in a view so appending again won't duplicate
     static resetView() {
-        const calendarHeaderText = document.querySelector("." + View.calendarHeader).firstChild;
-        calendarHeaderText.textContent = "";
-        const gridHeader = document.querySelector("." + View.gridHeader);
-        gridHeader.replaceChildren();
-        const grid = document.querySelector("." + View.grid);
+        const grid = document.querySelector("#" + View.calendarGrid);
         grid.replaceChildren();
     }
-    
 }
 
-// maybe getLocale function?
 class MonthView extends View {
     drawCalendarHeader() {
         const locale = navigator.language;
@@ -131,18 +127,19 @@ class MonthView extends View {
             days.push(monday.toLocaleDateString(locale, options));
             monday.setDate(monday.getDate() + 1);
         }
-        const header = document.querySelector("." + View.gridHeader);
+        const grid = document.querySelector("#" + View.calendarGrid);
         days.forEach(day => {
             const li = document.createElement("li");
-            li.innerText = day;
-            header.appendChild(li);
+            li.className += View.gridHeader;
+            li.textContent = day;
+            grid.appendChild(li);
         });
     }
 
     #drawOtherDays(grid, start, end, class_string, text) {
     for (let i = start; i < end; i++) {
             const day = document.createElement("li");
-            day.setAttribute("class", class_string);
+            day.classList.add(class_string, View.gridContent);
             const span = document.createElement("span");
             span.textContent = text;
             day.appendChild(span);
@@ -164,7 +161,7 @@ class MonthView extends View {
 
     #createEventElement(e) {
         const div = document.createElement("div");
-        div.setAttribute("class", "event");
+        div.className += "event";
         div.setAttribute("data-eventid", e.eventid);
         div.setAttribute("data-toggle", "popover");
         const locale = navigator.language;
@@ -195,23 +192,32 @@ class MonthView extends View {
             }            
         })();
         
-        const grid = document.querySelector(".grid");
+        const grid = document.querySelector("#" + View.calendarGrid);
+        // number of rows is needed for grid row height
+        grid.setAttribute("grid-rows", totalDaysShown / 7);
+        console.log(totalDaysShown / 7);
         this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev"); 
         const today = new Date();
         const events = getEvents();
         for (let i = 1; i <= numberOfDays; i++) {
             const day = document.createElement("li");
+            day.className += View.gridContent;
             if (this.#isSameDay(today, i)) {
-                day.setAttribute("id", "today");
+                day.id = "today";
             }
             const span = document.createElement("span");
             span.textContent = i;
+            span.className = "day-header";
             day.appendChild(span);
+            // the container is used to make only the events in it scrollable
+            // and keep the day header in place
+            const container = document.createElement("div");
+            container.className = "event-container";
             const events_today = this.#getEventsForDay(events, i)
-            events_today.forEach((e) => day.appendChild(this.#createEventElement(e)));
+            events_today.forEach((e) => container.appendChild(this.#createEventElement(e)));
+            day.appendChild(container);
             grid.appendChild(day);
         }
-
         this.#drawOtherDays(grid, numberOfDays + firstDayOn, totalDaysShown, "month-next", "next");
     }
 
@@ -266,7 +272,8 @@ class MonthView extends View {
 function draw() {
     View.resetView();
     const datePicker = document.querySelector("#date-picker");
-    //must check if it is valid date (some browsers might default to text input), else maybe set as today
+    //should check if it is valid date (some browsers might default to text input)
+    //else maybe set as today
     const v = new MonthView(datePicker.value);
     v.drawCalendarHeader();
     v.drawGridHeader();
