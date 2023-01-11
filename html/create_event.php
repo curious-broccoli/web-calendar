@@ -22,11 +22,11 @@ class Event {
     private DateTime $end;
     private int $user_id;
     private ApprovalState $approval_state;
-    private int|null $series_id;
     private int|null $approved_by;
+    private int|null $series_id;
+    private DateTime $create_date;
     // TODO:
-    // submit time
-    // ...
+    // all other required values
 
     public function __construct() {
         $this->setName();
@@ -37,6 +37,7 @@ class Event {
         $this->setApprovalState();
         $this->setSeries();
         $this->setApprovedBy();
+        $this->setCreateDate();
     }
     
     private function setName() : void {
@@ -105,12 +106,8 @@ class Event {
         return $d && $d->format(self::DATEFORMAT) === $date;
     }
 
-    private function getStartDateString() : string {
-        return $this->start->format(self::DATEFORMAT);
-    }
-
-    private function getEndDateString(): string {
-        return $this->end->format(self::DATEFORMAT);
+    private function getDateString(DateTime $date) : string {
+        return $date->format(self::DATEFORMAT);
     }
 
     private function setUserId() : void {
@@ -155,31 +152,38 @@ class Event {
         }
     }
 
+    private function setCreateDate(): void {
+        // it will be UTC unless php.ini is set to anything else
+        $this->create_date = new DateTime("now");
+    }
+
     public function insert_db(PDO $dbh) : void {
-        $stmt = $dbh->prepare("
-        INSERT INTO event (
-        name, description, datetime_start, datetime_end, location,
-        created_by, approval_state, approved_by, event_series) VALUES (
-        :name, :description, :start, :end, :location, :created_by,
-        :approval_state, :approved_by, :series);");
-        
         try {
+            $stmt = $dbh->prepare("
+            INSERT INTO event (
+            name, description, datetime_start, datetime_end, location,
+            created_by, approval_state, approved_by, datetime_creation, event_series)
+            VALUES (
+            :name, :description, :start, :end, :location, :created_by,
+            :approval_state, :approved_by, :creation_time, :series);");
+
             $stmt->execute(array(
                 ":name" => $this->name,
                 ":description" => $this->description,
-                ":start" => $this->getStartDateString(),
-                ":end" => $this->getEndDateString(),
+                ":start" => $this->getDateString($this->start),
+                ":end" => $this->getDateString($this->end),
                 ":location" => $this->location,
                 ":created_by" => $this->user_id,
                 ":approval_state" => $this->approval_state->value,
                 ":approved_by" => $this->approved_by,
+                ":creation_time" => $this->getDateString($this->create_date),
                 ":series" => $this->series_id
             ));
             echo "Successfully submitted event!<br/>";
         } catch (PDOException $e) {
             // printing detailed error to user might be bad, change this later?
-            //die("Error!: " . $e->getMessage() . "<br/>");
-            die("Sorry, something went wrong! Please try again.");
+            die("Error!: " . $e->getMessage() . "<br/>");
+            //die("Sorry, something went wrong! Please try again.");
         }
     }
 }
