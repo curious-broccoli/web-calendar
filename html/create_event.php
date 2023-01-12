@@ -39,36 +39,76 @@ class Event {
         $this->setApprovedBy();
         $this->setCreateDate();
     }
+
+    public function getName(): string {
+        return $this->name;
+    }
+
+    public function getLocation(): string {
+        return $this->location;
+    }
+
+    public function getDescription(): string {
+        return $this->description;
+    }
+
+    public function getStart(): string {
+        return $this->getDateString($this->start);
+    }
+
+    public function getEnd(): string {
+        return $this->getDateString($this->end);
+    }
+
+    public function getCreateDate(): string {
+        return $this->getDateString($this->create_date);
+    }
+
+    public function getUserId(): int {
+        return $this->user_id;
+    }
+
+    public function getApprovalState(): int {
+        return $this->approval_state->value;
+    }
+
+    public function getApprovedBy(): int|null {
+        return $this->approved_by;
+    }
+
+    public function getSeriesId(): int|null {
+        return $this->series_id;
+    }
     
     private function setName() : void {
-        $this->name = $this->getSanitizedString("name");
+        $this->name = $this->processString("name", 150);
     }
 
     private function setLocation(): void {
-        $this->location = $this->getSanitizedString("location");
+        $this->location = $this->processString("location", 100);
     }
 
     private function setDescription(): void {
-        $this->description = $this->getHtmlString("description");
+        $this->description = $this->processString("description", 1000, true, true);
     }
 
-    private function getSanitizedString(string $var_name) : string {
-        // TODO: add a maxLength parameter and maybe merge getSanitized and getHtml
+    private function processString(string $var_name, int $maxLength, bool $allowEmpty = false, bool $allowHtml = false) : string {
+        // TODO: rename function probably
+        // TODO: argument to strip like emojis and weird stuff (before or after html?)
         $string = $_POST[$var_name];
-        if (empty($string)) {
+        if (empty($string) && !$allowEmpty) {
             throw new Exception("Please enter a " . $var_name . " value!");
         }
-        $sanitized = strip_tags($string);
-        // checks if whole string got deleted by stripping
-        if (empty($sanitized)) {
-            throw new Exception("Please enter a " . $var_name . " value without HTML!");
+        if (!$allowHtml) {
+            $string = strip_tags($string);
+            // checks if whole string got deleted by stripping
+            // so user would not get confused by error
+            if (empty($string) && !$allowEmpty) {
+                throw new Exception("Please enter a " . $var_name . " value without HTML!");
+            }
         }
-        return $sanitized;
-    }
-
-    private function getHtmlString(string $var_name) : string {
-        // TODO: add a maxLength parameter
-        $string = $_POST[$var_name];
+        // TODO: maxLength
+        
         return $string;
     }
 
@@ -156,42 +196,42 @@ class Event {
         // it will be UTC unless php.ini is set to anything else
         $this->create_date = new DateTime("now");
     }
+}
 
-    public function insert_db(PDO $dbh) : void {
-        try {
-            $stmt = $dbh->prepare("
-            INSERT INTO event (
-            name, description, datetime_start, datetime_end, location,
-            created_by, approval_state, approved_by, datetime_creation, event_series)
-            VALUES (
-            :name, :description, :start, :end, :location, :created_by,
-            :approval_state, :approved_by, :creation_time, :series);");
+function insertEventInDb(PDO $dbh, Event $event) : void {
+    try {
+        $stmt = $dbh->prepare("
+        INSERT INTO event (
+        name, description, datetime_start, datetime_end, location,
+        created_by, approval_state, approved_by, datetime_creation, event_series)
+        VALUES (
+        :name, :description, :start, :end, :location, :created_by,
+        :approval_state, :approved_by, :creation_time, :series);");
 
-            $stmt->execute(array(
-                ":name" => $this->name,
-                ":description" => $this->description,
-                ":start" => $this->getDateString($this->start),
-                ":end" => $this->getDateString($this->end),
-                ":location" => $this->location,
-                ":created_by" => $this->user_id,
-                ":approval_state" => $this->approval_state->value,
-                ":approved_by" => $this->approved_by,
-                ":creation_time" => $this->getDateString($this->create_date),
-                ":series" => $this->series_id
-            ));
-            echo "Successfully submitted event!<br/>";
-        } catch (PDOException $e) {
-            // printing detailed error to user might be bad, change this later?
-            die("Error!: " . $e->getMessage() . "<br/>");
-            //die("Sorry, something went wrong! Please try again.");
-        }
+        $stmt->execute(array(
+            ":name" => $event->getName(),
+            ":description" => $event->getDescription(),
+            ":start" => $event->getStart(),
+            ":end" => $event->getEnd(),
+            ":location" => $event->getLocation(),
+            ":created_by" => $event->getUserId(),
+            ":approval_state" => $event->getApprovalState(),
+            ":approved_by" => $event->getApprovedBy(),
+            ":creation_time" => $event->getCreateDate(),
+            ":series" => $event->getSeriesId()
+        ));
+        echo "Successfully submitted event!<br/>";
+    } catch (PDOException $e) {
+        // printing detailed error to user might be bad, change this later?
+        die("Error!: " . $e->getMessage() . "<br/>");
+        //die("Sorry, something went wrong! Please try again.");
     }
 }
 
 session_start();
 try {
     $event = new Event();
-} catch (Exception $e) {
+} catch (Exception $e) {    
     error_and_redirect($e->getMessage());
 }
 catch (Error $e) {
@@ -199,6 +239,6 @@ catch (Error $e) {
     //error_and_redirect("Fatal error!");
     error_and_redirect("Fatal error: " . $e->getMessage());
 }
-$event->insert_db($dbh);
+insertEventInDb($dbh, $event);
 
 ?>
