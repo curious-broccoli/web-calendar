@@ -4,6 +4,8 @@
 html/test.php
 *.pdf
 
+phpunit.phar
+
 # remove it if I properly use npm later
 package*.json
 

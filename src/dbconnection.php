@@ -49,6 +49,7 @@ function insert_guest_user(PDO $dbh) {
 
 $db_path = __DIR__ . "/../calendar.sqlite";
 try {
+    // TODO: check if (!$dbh) ?
     $dbh = new PDO("sqlite:$db_path");
     // enable foreign keys support
     $dbh->exec("PRAGMA foreign_keys = ON;");
