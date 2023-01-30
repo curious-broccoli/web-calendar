@@ -1,9 +1,10 @@
 # database
 *.sqlite
 
-html/test.php
+test.php
 *.pdf
 
+fcgid-bin/
 phpunit.phar
 
 # remove it if I properly use npm later
