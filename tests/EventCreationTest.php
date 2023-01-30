@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 final class EventCreationTest extends TestCase {
     private function initPost($name, $location, $description, $start, $end, $series) : void {
-        $_POST = array(); // clear it
+        $_POST = array(); // clears array
         $_POST["name"] = $name;
         $_POST["location"] = $location;
         $_POST["description"] = $description;
@@ -96,23 +96,68 @@ final class EventCreationTest extends TestCase {
 
     public function testTrimString() : void {
         // test that too long name is trimmed
-        $tooLongName = str_repeat("x", 151);
-        $this->initPost($tooLongName, "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
+        $length = 150;
+        $tooLongText = str_repeat("x", $length + 1);
+        $this->initPost($tooLongText, "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
         $event = new Event();
-        $this->assertSame(150, strlen($event->getName()));
+        $this->assertSame($length, strlen($event->getName()));
+
+        // test that short enough strings work
+        $length = 100;
+        $tooLongText = str_repeat("x", $length);
+        $this->initPost($tooLongText, "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
+        $this->initSession();
+        $event = new Event();
+        $this->assertSame($length, strlen($event->getName()));
 
         // test that too long description is trimmed
-        $tooLongName = str_repeat("x", 1001);
-        $this->initPost($tooLongName, "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
+        $length = 1000;
+        $tooLongText = str_repeat("x", $length + 1);
+        $this->initPost($tooLongText, "testLocation", $tooLongText, "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
         $event = new Event();
-        $this->assertSame(1000, strlen($event->getDescription()));
+        $this->assertSame($length, strlen($event->getDescription()));
     }
 
-    // test false input
+    public function testApprovalState() : void {
+        // test default
+        $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
+        $this->initSession();
+        $event = new Event();
+        $this->assertSame($event->getApprovalState(), 0);
+    }
+
+    public function testSeries() : void {
+        $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
+        $this->initSession();
+        $event = new Event();
+        $this->assertSame($event->getSeriesId(), null);
+
+        $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "1");
+        $this->initSession();
+        $event = new Event();
+        $this->assertSame($event->getSeriesId(), 1);
+    }
+
+    public function testUser() : void {
+        // test default
+        $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
+        $this->initSession();
+        $event = new Event();
+        $this->assertSame($event->getUserId(), 1);
+    }
+
+    public function testApprovedBy(): void {
+        // test default
+        $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
+        $this->initSession();
+        $event = new Event();
+        $this->assertSame($event->getApprovedBy(), null);
+    }
+
+    // TODO:
     // test user id
-    // test approval state
-    // test approved by
-    // test series?
+    // test approval state with session's user id
+    // test approved by with session's user id
 }

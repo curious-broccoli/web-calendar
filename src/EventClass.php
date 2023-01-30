@@ -97,13 +97,13 @@ class Event {
         if (!$allowHtml) {
             $string = strip_tags($string);
             // checks if whole string got deleted by stripping
-            // so user would not get confused by error
+            // so user would not get confused by more generic error
             if (empty($string) && !$allowEmpty) {
                 throw new Exception("Please enter a " . $var_name . " value without HTML!");
             }
         }
-        // TODO: maxLength
         
+        $string = substr($string, 0, $maxLength);        
         return $string;
     }
 
