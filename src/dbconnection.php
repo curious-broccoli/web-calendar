@@ -47,7 +47,7 @@ function insert_guest_user(PDO $dbh) {
     }
 }
 
-$db_path = __DIR__ . "/../calendar.sqlite";
+$db_path = __DIR__ . "/../database/calendar.sqlite";
 try {
     // TODO: check if (!$dbh) ?
     $dbh = new PDO("sqlite:$db_path");
