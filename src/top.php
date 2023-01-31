@@ -22,7 +22,7 @@
 
 <body>
     <?php
-    if ($hide_nav == false) { ?>
+    if (!isset($hide_nav)) { ?>
         <nav>
             <ul class="nav-bar">
                 <li><a href="/">Login</a></li>

@@ -6,7 +6,7 @@ function create_table_user(PDO $dbh) {
         userid INTEGER PRIMARY KEY,
         name TEXT UNIQUE NOT NULL,
         hash TEXT NOT NULL,
-        role INTEGER NOT NULL,
+        role INTEGER,
         FOREIGN KEY (role) REFERENCES role(roleid)
         );");
 }
@@ -24,7 +24,6 @@ function create_table_event(PDO $dbh) {
         approved_by INTEGER,
         datetime_creation TEXT NOT NULL,
         event_series INTEGER,
-        role INTEGER,
         FOREIGN KEY (created_by) REFERENCES user(userid),
         FOREIGN KEY (approved_by) REFERENCES user(userid),
         FOREIGN KEY (event_series) REFERENCES event_series(seriesid)
@@ -60,12 +59,8 @@ function insert_guest_user(PDO $dbh) {
     $name = "guest";
     // this should prevent anyone from logging in as user 'guest'
     $hash = "ßßßßßßßßßßßßßßßßßßßßßßß";
-    try {
-        $dbh->query("INSERT INTO user (userid, name, hash) VALUES (
-            $userid, '$name', '$hash');");
-    } catch (PDOException) {
-        // so I don't have to test if "guest" user already exists
-    }
+    $dbh->query("INSERT OR IGNORE INTO user (userid, name, hash, role) VALUES (
+            $userid, '$name', '$hash', null);");
 }
 
 $db_path = __DIR__ . "/../database/calendar.sqlite";

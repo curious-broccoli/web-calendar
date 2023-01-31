@@ -8,7 +8,7 @@ define("ERROR_REDIRECT_LOCATION", "/new_event.php");
 
 session_start();
 try {
-    $event = new Event();
+    $event = new Event($dbh);
 } catch (Exception $e) {    
     error_and_redirect($e->getMessage());
 }

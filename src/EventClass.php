@@ -23,13 +23,15 @@ class Event {
     // TODO:
     // all other required values
 
-    public function __construct() {
+    public function __construct($dbh) {
+        // for creating a new event and not loading an event from DB
+        // the order of execution matters
         $this->setName();
         $this->setLocation();
         $this->setDescription();
         $this->setStartEnd();
         $this->setUserId();
-        $this->setApprovalState();
+        $this->setApprovalState($dbh);
         $this->setSeries();
         $this->setApprovedBy();
         $this->setCreateDate();
@@ -147,17 +149,23 @@ class Event {
 
     private function setUserId() : void {
         $var_name = "userid";
-        if (isset($_SESSION[$var_name])) {
-            $user_id = $_SESSION[$var_name];
-        } else {
-            $user_id = 1;
-        }
+        $user_id = $_SESSION[$var_name] ?? 1;
         $this->user_id = $user_id;
     }
 
-    private function setApprovalState() : void {
-        // TODO: if moderator created the event, set approval state to approved
-        $this->approval_state = ApprovalState::Waiting;
+    private function setApprovalState($dbh) : void {
+        if ($this->user_id == 1) {
+            $this->approval_state = ApprovalState::Waiting;
+        }
+        else {
+            $role = get_user_role($_SESSION["userid"], $dbh);
+            if (in_array($role, [Role::Approver, Role::Moderator], true)) {
+                $this->approval_state = ApprovalState::Approved;
+            }
+            else {
+                $this->approval_state = ApprovalState::Waiting;
+            }
+        }
     }
 
     private function setSeries() : void {
@@ -177,12 +185,12 @@ class Event {
     }
 
     private function setApprovedBy() : void {
+        // no need to test for rejected because that cannot happen until here
         if ($this->approval_state == ApprovalState::Waiting) {
             $this->approved_by = null;
         }
+        // if approved
         else {
-            // TODO: should be the moderator's userid
-            // (if it auto approves when they create one)
             $this->approved_by = $this->user_id;
         }
     }
