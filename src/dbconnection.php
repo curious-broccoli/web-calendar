@@ -1,10 +1,13 @@
 <?php
+require_once __DIR__ . "/../src/Role.php";
 
 function create_table_user(PDO $dbh) {
     $dbh->query("CREATE TABLE IF NOT EXISTS user (
         userid INTEGER PRIMARY KEY,
         name TEXT UNIQUE NOT NULL,
-        hash TEXT NOT NULL
+        hash TEXT NOT NULL,
+        role INTEGER NOT NULL,
+        FOREIGN KEY (role) REFERENCES role(roleid)
         );");
 }
 
@@ -21,6 +24,7 @@ function create_table_event(PDO $dbh) {
         approved_by INTEGER,
         datetime_creation TEXT NOT NULL,
         event_series INTEGER,
+        role INTEGER,
         FOREIGN KEY (created_by) REFERENCES user(userid),
         FOREIGN KEY (approved_by) REFERENCES user(userid),
         FOREIGN KEY (event_series) REFERENCES event_series(seriesid)
@@ -32,6 +36,23 @@ function create_table_series(PDO $dbh) {
         seriesid INTEGER PRIMARY KEY,
         name TEXT UNIQUE NOT NULL
         );");
+}
+
+function create_table_role(PDO $dbh) {
+    $dbh->query("CREATE TABLE IF NOT EXISTS role (
+        roleid INTEGER PRIMARY KEY,
+        name TEXT UNIQUE NOT NULL
+        );");
+    $roles = [
+        Role::Default->value => "default",
+        Role::Approver->value => "approver",
+        Role::Moderator->value => "moderator"
+    ];
+    foreach ($roles as $key => $value) {
+        $dbh->query("INSERT OR IGNORE INTO role (roleid, name) VALUES (
+        $key, '$value'
+        );");
+    }
 }
 
 function insert_guest_user(PDO $dbh) {
@@ -58,6 +79,7 @@ try {
     insert_guest_user($dbh);
     create_table_event($dbh);
     create_table_series($dbh);
+    create_table_role($dbh);
 } catch (PDOException $e) {
     // printing detailed error to user would be bad, change this later?
     die("Error!: " . $e->getMessage() . "<br/>");

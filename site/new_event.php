@@ -27,7 +27,10 @@ session_start();
         }
         ?>
     </select><br />
-    Put security question or captcha here later.<br />
+    <?php
+    if (!isset($_SESSION["userid"])) {?>
+        Put security question or captcha here later.<br />
+    <?php }?>
     <input type="submit" name="submit" value="Submit!" />
 </form>
 <?php
