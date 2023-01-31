@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
 require_once __DIR__ . "/../src/flash_message.php";
+require_once __DIR__ . "/../src/Role.php";
 
 function is_valid_password(string $passwordCandidate, string $name) {
     $minLength = 8;
@@ -48,9 +49,9 @@ function register_user(PDO $dbh, string $name, string $passwordCandidate) {
     
     // register
     $hash = password_hash($passwordCandidate, PASSWORD_DEFAULT);
-    $stmt = $dbh->prepare("INSERT INTO user (name, hash)
-                            VALUES (:name, :hash);");
-    $stmt->execute(array(":name" => $name, ":hash" => $hash));
+    $stmt = $dbh->prepare("INSERT INTO user (name, hash, role)
+                            VALUES (:name, :hash, :role);");
+    $stmt->execute(array(":name" => $name, ":hash" => $hash, ":role" => Role::Default->value));
     echo "Successfully registered!\n";
     // redirect to calendar
     // header(calendar.php)

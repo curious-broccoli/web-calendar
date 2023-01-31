@@ -4,6 +4,8 @@ function reqListener () {
 
 //EVENTS SHOULD ONLY BE REQUESTED THE FIRST TIME AND ON EXPLICIT REFRESH REQUEST IN GUI
 //should only get from past two and next 12 months
+// maybe move this into a method requestEvents() of the view class
+// to then use the view's selected date after creating view instance
 const req = new XMLHttpRequest();
 req.addEventListener("load", reqListener);
 //should it be called async or not?
