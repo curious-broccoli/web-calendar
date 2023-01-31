@@ -1,6 +1,7 @@
 <?php
 $title = "Calendar";
 $my_script = "calendar.js";
+$hide_nav = true;
 include __DIR__ . "/../src/top.php";
 require_once __DIR__ . "/../src/dbconnection.php";
 

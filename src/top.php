@@ -21,3 +21,14 @@
 </head>
 
 <body>
+    <?php
+    if ($hide_nav == false) { ?>
+        <nav>
+            <ul class="nav-bar">
+                <li><a href="/">Login</a></li>
+                <li><a href="/new_event.php">Create event</a></li>
+                <li><a href="/calendar.php">Calendar</a></li>
+                <li><a href="/logout.php">Logout</a></li>
+            </ul>
+        </nav>
+    <?php } ?>

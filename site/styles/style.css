@@ -113,3 +113,14 @@ li.popover-data-left {
     text-align: right;
     margin-right: 6px;
 }
+
+/* NAVBAR */
+ul.nav-bar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-bar li {
+    display: inline;
+}
