@@ -7,7 +7,7 @@ require_once __DIR__ . "/../src/dbconnection.php";
 session_start();
 ?>
 <h2>New event</h2>
-<form action="create_event.php" method="post">
+<form action="create-event.php" method="post">
     <input type="text" name="name" placeholder="Event name" required autofocus /><br />
     <input type="text" name="location" placeholder="Location" required /><br />
     Start<br />
