@@ -1,10 +1,17 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . "/../src/EventClass.php";
-
 use PHPUnit\Framework\TestCase;
 
+// maybe do the array filling in setUp method?
 final class EventCreationTest extends TestCase {
+    private function getDbh() : PDO {
+        $db_path = __DIR__ . "/../database/calendar.sqlite";
+        $dbh = new PDO("sqlite:$db_path");
+        $dbh->exec("PRAGMA foreign_keys = ON;");
+        return $dbh;
+    }
+
     private function initPost($name, $location, $description, $start, $end, $series) : void {
         $_POST = array(); // clears array
         $_POST["name"] = $name;
@@ -18,11 +25,11 @@ final class EventCreationTest extends TestCase {
     private function initSession() : void {
         $_SESSION = array();
     }
-    
+
     public function testCorrectSimpleInput(): void {
         $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getName(), "testName");
         $this->assertSame($event->getDescription(), "");
         $this->assertSame($event->getLocation(), "testLocation");
@@ -42,7 +49,7 @@ final class EventCreationTest extends TestCase {
         // test that end is set = start if smaller than start
         $this->initPost("<b>name", "<script>location</script>", "testDesc", "2000-12-12T12:12:12.000Z", "1999-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getEnd(), $event->getStart());
     }
 
@@ -53,21 +60,21 @@ final class EventCreationTest extends TestCase {
         $this->expectException(Exception::class);
         // if message contains
         $this->expectExceptionMessage("name value");
-        $event = new Event();
+        $event = new Event($this->getDbh());
     }
 
     public function testHtmlStrip() : void {
         // test that not whole string is deleted
         $this->initPost("<b>name", "<script>location</script>", "testDesc", "2000-12-12T12:12:12.000Z", "1999-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getName(), "name");
         $this->assertSame($event->getLocation(), "location");
 
         // test that description allows HTML
         $this->initPost("<b>name", "<script>location</script>", "<script>alert(1);</script>", "2000-12-12T12:12:12.000Z", "1999-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getDescription(), "<script>alert(1);</script>");
 
         // test that it throws an exception after stripping the whole location
@@ -75,14 +82,14 @@ final class EventCreationTest extends TestCase {
         $this->initSession();
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("location value");
-        $event = new Event();        
+        $event = new Event($this->getDbh());
     }
 
     public function testMissingPostKey() : void {
         $_POST = array();
         $this->expectError();
         $this->expectErrorMessage('key "name"');
-        $event = new Event();
+        $event = new Event($this->getDbh());
     }
 
     public function testInvalidDate() : void {
@@ -91,7 +98,7 @@ final class EventCreationTest extends TestCase {
         $this->initSession();
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("start and end value");
-        $event = new Event();
+        $event = new Event($this->getDbh());
     }
 
     public function testTrimString() : void {
@@ -100,7 +107,7 @@ final class EventCreationTest extends TestCase {
         $tooLongText = str_repeat("x", $length + 1);
         $this->initPost($tooLongText, "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($length, strlen($event->getName()));
 
         // test that short enough strings work
@@ -108,7 +115,7 @@ final class EventCreationTest extends TestCase {
         $tooLongText = str_repeat("x", $length);
         $this->initPost($tooLongText, "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($length, strlen($event->getName()));
 
         // test that too long description is trimmed
@@ -116,7 +123,7 @@ final class EventCreationTest extends TestCase {
         $tooLongText = str_repeat("x", $length + 1);
         $this->initPost($tooLongText, "testLocation", $tooLongText, "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($length, strlen($event->getDescription()));
     }
 
@@ -124,19 +131,19 @@ final class EventCreationTest extends TestCase {
         // test default
         $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getApprovalState(), 0);
     }
 
     public function testSeries() : void {
         $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getSeriesId(), null);
 
         $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "1");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getSeriesId(), 1);
     }
 
@@ -144,7 +151,7 @@ final class EventCreationTest extends TestCase {
         // test default
         $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getUserId(), 1);
     }
 
@@ -152,7 +159,7 @@ final class EventCreationTest extends TestCase {
         // test default
         $this->initPost("testName", "testLocation", "", "2000-12-12T12:12:12.000Z", "2023-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $event = new Event();
+        $event = new Event($this->getDbh());
         $this->assertSame($event->getApprovedBy(), null);
     }
 

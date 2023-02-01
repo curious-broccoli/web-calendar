@@ -1,15 +1,20 @@
 function reqListener () {
+    // TODO: if response OK
     sessionStorage.setItem("events", this.responseText);
 }
 
-//EVENTS SHOULD ONLY BE REQUESTED THE FIRST TIME AND ON EXPLICIT REFRESH REQUEST IN GUI
-//should only get from past two and next 12 months
+//EVENTS SHOULD maybe ONLY BE REQUESTED THE FIRST TIME AND ON EXPLICIT REFRESH REQUEST IN GUI
+// by default should only get from past two and next 12 months
+// bigger (different?) range when needed
 // maybe move this into a method requestEvents() of the view class
 // to then use the view's selected date after creating view instance
+const urlParams = new URLSearchParams();
+urlParams.set("state", 0);
+
 const req = new XMLHttpRequest();
 req.addEventListener("load", reqListener);
-//should it be called async or not?
-req.open("GET", "get-events.php", true);
+// if it's async it will try to draw before loading
+req.open("GET", "get-events.php?" + urlParams.toString(), false);
 req.send();
 
 // make a map/dict with database index as key instead of an array
@@ -19,7 +24,7 @@ const getEvents = () => {
     if(sessionStorage.getItem("events") === null){
         events = [];
     }else {
-        events = JSON.parse(sessionStorage.getItem("events"), (key, value) => 
+        events = JSON.parse(sessionStorage.getItem("events"), (key, value) =>
             key === "datetime_end" || key === "datetime_start"
             ? new Date(value)
             : value
@@ -158,7 +163,7 @@ class MonthView extends View {
     }
 
     #getEventsForDay(events, day_number) {
-        return events.filter((e) => this.#isSameDay(e.datetime_start, day_number))            
+        return events.filter((e) => this.#isSameDay(e.datetime_start, day_number))
     }
 
     #createEventElement(e) {
@@ -191,14 +196,13 @@ class MonthView extends View {
             }
             else {
                 return daysPerRow * 6;
-            }            
+            }
         })();
-        
+
         const grid = document.querySelector("#" + View.calendarGrid);
         // number of rows is needed for grid row height
         grid.setAttribute("grid-rows", totalDaysShown / 7);
-        console.log(totalDaysShown / 7);
-        this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev"); 
+        this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev");
         const today = new Date();
         const events = getEvents();
         for (let i = 1; i <= numberOfDays; i++) {
@@ -304,4 +308,3 @@ function start() {
 
 
 
-  

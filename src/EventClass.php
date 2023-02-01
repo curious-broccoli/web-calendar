@@ -13,15 +13,13 @@ class Event {
     private string $location;
     private string $description;
     // maybe string for dates is even better in this case?
-    private DateTime $start;
-    private DateTime $end;
+    private DateTimeImmutable $start;
+    private DateTimeImmutable $end;
     private int $user_id;
     private ApprovalState $approval_state;
     private int|null $approved_by;
     private int|null $series_id;
-    private DateTime $create_date;
-    // TODO:
-    // all other required values
+    private DateTimeImmutable $create_date;
 
     public function __construct($dbh) {
         // for creating a new event and not loading an event from DB
@@ -76,7 +74,7 @@ class Event {
     public function getSeriesId(): int|null {
         return $this->series_id;
     }
-    
+
     private function setName() : void {
         $this->name = $this->processString("name", 150);
     }
@@ -104,8 +102,8 @@ class Event {
                 throw new Exception("Please enter a " . $var_name . " value without HTML!");
             }
         }
-        
-        $string = substr($string, 0, $maxLength);        
+
+        $string = substr($string, 0, $maxLength);
         return $string;
     }
 
@@ -117,12 +115,12 @@ class Event {
         }
     }
 
-    private function parseDate(string $var_name) : DateTime {
+    private function parseDate(string $var_name) : DateTimeInterface {
         $date_string = $_POST[$var_name];
         if ($this->isValidDate($date_string)) {
             // maybe return the DateTime from isValidDate() so I don't need
             // to parse it again?
-            return DateTime::createFromFormat(self::DATEFORMAT, $date_string);
+            return DateTimeImmutable::createFromFormat(self::DATEFORMAT, $date_string);
         }
         else {
             throw new Exception("Please enter valid start and end values!");
@@ -131,19 +129,19 @@ class Event {
 
     /**
      * Checks if string is valid date in the format
-     * 
+     *
      * Checks if the date string is a valid date in the format
      * without overflowing
      * e.g. "2023-02-30T13:24:00.000Z" would not be valid
      */
     private function isValidDate(string $date) : bool {
-        $d = DateTime::createFromFormat(self::DATEFORMAT, $date);
+        $d = DateTimeImmutable::createFromFormat(self::DATEFORMAT, $date);
         // The Y ( 4 digits year ) returns TRUE for any integer with any number
         // of digits so changing the comparison from == to === fixes the issue.
         return $d && $d->format(self::DATEFORMAT) === $date;
     }
 
-    private function getDateString(DateTime $date) : string {
+    private function getDateString(DateTimeImmutable $date) : string {
         return $date->format(self::DATEFORMAT);
     }
 
@@ -197,7 +195,7 @@ class Event {
 
     private function setCreateDate(): void {
         // it will be UTC unless php.ini is set to anything else
-        $this->create_date = new DateTime("now");
+        $this->create_date = new DateTimeImmutable("now");
     }
 }
 

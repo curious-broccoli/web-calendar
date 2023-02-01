@@ -67,7 +67,6 @@ $db_path = __DIR__ . "/../database/calendar.sqlite";
 try {
     // TODO: check if (!$dbh) ?
     $dbh = new PDO("sqlite:$db_path");
-    // enable foreign keys support
     $dbh->exec("PRAGMA foreign_keys = ON;");
     //all this stuff needs to be removed later and only be run once for a new database
     create_table_user($dbh);

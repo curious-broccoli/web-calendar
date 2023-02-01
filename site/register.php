@@ -46,12 +46,15 @@ function register_user(PDO $dbh, string $name, string $passwordCandidate) {
         header("Location: " . ERROR_REDIRECT_LOCATION);
         die();
     }
-    
+
     // register
     $hash = password_hash($passwordCandidate, PASSWORD_DEFAULT);
     $stmt = $dbh->prepare("INSERT INTO user (name, hash, role)
                             VALUES (:name, :hash, :role);");
-    $stmt->execute(array(":name" => $name, ":hash" => $hash, ":role" => Role::Default->value));
+    $parameters = array(":name" => $name,
+        ":hash" => $hash,
+        ":role" => Role::Default->value);
+    $stmt->execute($parameters);
     echo "Successfully registered!\n";
     // redirect to calendar
     // header(calendar.php)
