@@ -10,13 +10,13 @@ function reqListener () {
 // to then use the view's selected date after creating view instance
 function getUrlParams(state = null, start = null, end = null) {
     const urlParams = new URLSearchParams();
-    if (state) {
+    if (state != null && state != undefined) {
         urlParams.set("state", state);
     }
-    if (start) {
+    if (start != null && start != undefined) {
         urlParams.set("start", start);
     }
-    if (end) {
+    if (end != null && end != undefined) {
         urlParams.set("end", end);
     }
     return urlParams.toString();
@@ -25,7 +25,7 @@ function getUrlParams(state = null, start = null, end = null) {
 const req = new XMLHttpRequest();
 req.addEventListener("load", reqListener);
 // if it's async it will try to draw before loading
-$params = getUrlParams(0);
+params = getUrlParams(0);
 req.open("GET", "get-events.php?" + params, false);
 req.send();
 
