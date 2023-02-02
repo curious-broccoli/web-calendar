@@ -1,6 +1,8 @@
 <?php
 $title = "Create new event";
-$my_script = "form_timezone.js";
+$my_scripts = [
+    ["name" => "form_timezone.js", "isModule" => false]
+];
 include __DIR__ . "/../src/top.php";
 require_once __DIR__ . "/../src/flash_message.php";
 require_once __DIR__ . "/../src/dbconnection.php";

@@ -1,3 +1,5 @@
+import * as helper from "./helper.js";
+
 function reqListener () {
     // TODO: if response OK
     sessionStorage.setItem("events", this.responseText);
@@ -8,42 +10,12 @@ function reqListener () {
 // bigger (different?) range when needed
 // maybe move this into a method requestEvents() of the view class
 // to then use the view's selected date after creating view instance
-function getUrlParams(state = null, start = null, end = null) {
-    const urlParams = new URLSearchParams();
-    if (state != null && state != undefined) {
-        urlParams.set("state", state);
-    }
-    if (start != null && start != undefined) {
-        urlParams.set("start", start);
-    }
-    if (end != null && end != undefined) {
-        urlParams.set("end", end);
-    }
-    return urlParams.toString();
-}
-
 const req = new XMLHttpRequest();
 req.addEventListener("load", reqListener);
 // if it's async it will try to draw before loading
-params = getUrlParams(0);
+const params = helper.getUrlParams(1);
 req.open("GET", "get-events.php?" + params, false);
 req.send();
-
-// make a map/dict with database index as key instead of an array
-// for getting all the details for the event pop-overs
-const getEvents = () => {
-    let events;
-    if(sessionStorage.getItem("events") === null){
-        events = [];
-    }else {
-        events = JSON.parse(sessionStorage.getItem("events"), (key, value) =>
-            key === "datetime_end" || key === "datetime_start"
-            ? new Date(value)
-            : value
-        );
-    }
-    return events;
-}
 
 // I would put the functions below for popovers in the View class but
 // they would have to be called with this and this points to the html element
@@ -76,7 +48,7 @@ function formatDate(dateString) {
 }
 
 function getEventById(eventid) {
-    const events = getEvents();
+    const events = helper.getEvents();
     return events.find((element) => element.eventid === eventid);
 }
 
@@ -216,7 +188,7 @@ class MonthView extends View {
         grid.setAttribute("grid-rows", totalDaysShown / 7);
         this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev");
         const today = new Date();
-        const events = getEvents();
+        const events = helper.getEvents();
         for (let i = 1; i <= numberOfDays; i++) {
             const day = document.createElement("li");
             day.className += View.gridContent;

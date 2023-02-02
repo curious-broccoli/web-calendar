@@ -1,6 +1,8 @@
 <?php
 $title = 'Calendar login';
-$my_script = "index.js";
+$my_scripts = [
+    ["name" => "index.js", "isModule" => false]
+];
 include __DIR__ . "/../src/top.php";
 require_once __DIR__ . "/../src/flash_message.php";
 session_start();

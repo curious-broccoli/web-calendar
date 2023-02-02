@@ -11,11 +11,10 @@
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script defer src="scripts/purify.min.js"></script>
     <?php
-    if (!empty($my_script)) { ?>
-        <script defer src=<?= "scripts/" . $my_script ?>></script>
+    foreach ($my_scripts as $key => $script) { ?>
+        <script <?= $script["isModule"] == true ? 'type="module"' : "defer" ?> src=<?= "scripts/" . $script["name"] ?>></script>
     <?php
-    }
-    ?>
+    } ?>
     <noscript>Please enable JavaScript!</noscript>
     <title><?= $title ?></title>
 </head>
@@ -29,6 +28,7 @@
                 <li><a href="/new-event.php">Create event</a></li>
                 <li><a href="/calendar.php">Calendar</a></li>
                 <li><a href="/logout.php">Logout</a></li>
+                <li><a href="/admin.php">Moderator</a></li>
             </ul>
         </nav>
     <?php } ?>
