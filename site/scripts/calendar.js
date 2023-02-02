@@ -8,13 +8,25 @@ function reqListener () {
 // bigger (different?) range when needed
 // maybe move this into a method requestEvents() of the view class
 // to then use the view's selected date after creating view instance
-const urlParams = new URLSearchParams();
-urlParams.set("state", 0);
+function getUrlParams(state = null, start = null, end = null) {
+    const urlParams = new URLSearchParams();
+    if (state) {
+        urlParams.set("state", state);
+    }
+    if (start) {
+        urlParams.set("start", start);
+    }
+    if (end) {
+        urlParams.set("end", end);
+    }
+    return urlParams.toString();
+}
 
 const req = new XMLHttpRequest();
 req.addEventListener("load", reqListener);
 // if it's async it will try to draw before loading
-req.open("GET", "get-events.php?" + urlParams.toString(), false);
+$params = getUrlParams(0);
+req.open("GET", "get-events.php?" + params, false);
 req.send();
 
 // make a map/dict with database index as key instead of an array
