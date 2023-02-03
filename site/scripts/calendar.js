@@ -13,8 +13,9 @@ function reqListener () {
 const req = new XMLHttpRequest();
 req.addEventListener("load", reqListener);
 // if it's async it will try to draw before loading
-const params = helper.getUrlParams(1);
-req.open("GET", "get-events.php?" + params, false);
+const params = new URLSearchParams();
+params.set("state", 1);
+req.open("GET", "get-events.php?" + params.toString(), false);
 req.send();
 
 // I would put the functions below for popovers in the View class but

@@ -55,7 +55,11 @@ final class GetApprovalForGetEventsTest extends TestCase {
 
         $this->initGet("2000-12-12T12:12:12.000Z", "2000-12-12T12:12:12.000Z", "2");
         $this->initSession($userid);
-        $this->assertSame(get_approval_state($this->getDbh()), ApprovalState::Approved);
+        $this->assertSame(get_approval_state($this->getDbh()), ApprovalState::Rejected);
+
+        $this->initGet("2000-12-12T12:12:12.000Z", "2000-12-12T12:12:12.000Z", "0");
+        $this->initSession($userid);
+        $this->assertSame(get_approval_state($this->getDbh()), ApprovalState::Waiting);
 
         $this->initGet("2000-12-12T12:12:12.000Z", "2000-12-12T12:12:12.000Z", "1");
         $this->initSession($userid);

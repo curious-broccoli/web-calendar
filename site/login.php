@@ -16,7 +16,8 @@ function login_user(PDO $dbh, string $name, string $password) {
     }
     if (password_verify($password, $result["hash"])) {
         // redirect to calendar later on
-        // header(calendar.php);
+        // or maybe admin view if permitted
+        header("Location: /index.php");
         $_SESSION["userid"] = $result["userid"];
         echo "Successfully logged in!\n";
     }

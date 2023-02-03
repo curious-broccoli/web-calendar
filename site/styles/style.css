@@ -3,7 +3,9 @@
     --today-color: rgb(0, 140, 255);
     --main-background-color: #F2F2F2;
     --calendar-header-color: aqua;
-    --gap--color: #696767;
+    --gap-color: #696767;
+    --confirm-color: yellowgreen;
+    --reject-color: orange;
 }
 
 body {
@@ -124,4 +126,46 @@ ul.nav-bar {
 .nav-bar li {
     display: inline;
     background-color: lightgrey;
+}
+
+/* ADMIN SITE */
+#unprocessed-container {
+    border-style: solid;
+    border-width: 0.5px;
+    width: 60%;
+    margin-left: 8px;
+    margin-top: 6px;
+}
+
+
+.unprocessed-events div {
+    /* border-style: dashed;
+    border-width: 0.1px; */
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+.unprocessed-events span {
+    margin: 3px;
+}
+
+.unprocessed-button {
+    background: none !important;
+    border: none;
+    padding: 0 !important;
+    /*optional*/
+    font-family: arial, sans-serif;
+    /*input has OS specific font-family*/
+    color: #069;
+    text-decoration: underline;
+    cursor: pointer;
+    color: black;
+}
+
+.button-yes {
+    background-color: var(--confirm-color);
+}
+
+.button-no {
+    background-color: var(--reject-color);
 }
