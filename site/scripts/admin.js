@@ -18,12 +18,10 @@ req.send();
 // load event
 function transferComplete(e) {
     if (this.status === 200) {
-        // is removing the event from DOM good enough or should it refresh list?
-        // I think there is practically no difference besides
-        // potentially less events to check if someone else just did it
     }
     // if error (editing failed 400, ?, not enough permission 401/3 doesn't need a JS reaction)
     //alert(this.responseText);
+    // generic error with status code?
 }
 
 // click event
