@@ -57,6 +57,8 @@ function processEvent() {
     const eventid = Number(this.parentNode.dataset.eventid);
     const params = getCurrentEventParameters(eventid, action);
     req.send(params);
+    // TODO:
+    // hide form
 }
 
 function makeProcessButton(type) {
