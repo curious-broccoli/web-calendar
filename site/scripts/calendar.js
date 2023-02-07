@@ -48,12 +48,6 @@ function formatDate(dateString) {
     return date.toLocaleString(locale, options);
 }
 
-function getEventById(eventid) {
-    const events = helper.getEvents();
-    return events.find((element) => element.eventid === eventid);
-}
-
-
 Date.prototype.getDaysInMonth = function () {
     // getting day 0 of next month gives the last day of current month
     const d = new Date(this.getFullYear(), this.getMonth() + 1, 0);
@@ -221,12 +215,12 @@ class MonthView extends View {
             placement: "auto",
             trigger: "click",
             title: function () {
-                const event = getEventById(+this.dataset.eventid);
+                const event = helper.getEventById(+this.dataset.eventid);
                 const text = document.createTextNode(event.name);
                 return text;
             },
             content: function () {
-                const event = getEventById(+this.dataset.eventid);
+                const event = helper.getEventById(+this.dataset.eventid);
                 const data = {
                     name: {
                         label: "Title", value: event.name, allowHtml: false

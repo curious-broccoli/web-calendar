@@ -24,6 +24,7 @@ function create_table_event(PDO $dbh) {
         approved_by INTEGER,
         datetime_creation TEXT NOT NULL,
         event_series INTEGER,
+        last_change TEXT NOT NULL,
         FOREIGN KEY (created_by) REFERENCES user(userid),
         FOREIGN KEY (approved_by) REFERENCES user(userid),
         FOREIGN KEY (event_series) REFERENCES event_series(seriesid)

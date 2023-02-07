@@ -20,6 +20,7 @@ class Event {
     private int|null $approved_by;
     private int|null $series_id;
     private DateTimeImmutable $create_date;
+    private DateTimeImmutable $last_change;
 
     public function __construct($dbh) {
         // for creating a new event and not loading an event from DB
@@ -33,6 +34,7 @@ class Event {
         $this->setSeries();
         $this->setApprovedBy();
         $this->setCreateDate();
+        $this->setLastChange();
     }
 
     public function getName(): string {
@@ -57,6 +59,10 @@ class Event {
 
     public function getCreateDate(): string {
         return $this->getDateString($this->create_date);
+    }
+
+    public function getLastChange(): string {
+        return $this->getDateString($this->last_change);
     }
 
     public function getUserId(): int {
@@ -141,6 +147,9 @@ class Event {
         return $d && $d->format(self::DATEFORMAT) === $date;
     }
 
+    /**
+     * returns the passed date as ISO 8601 string
+     */
     private function getDateString(DateTimeImmutable $date) : string {
         return $date->format(self::DATEFORMAT);
     }
@@ -197,6 +206,10 @@ class Event {
         // it will be UTC unless php.ini is set to anything else
         $this->create_date = new DateTimeImmutable("now");
     }
+
+    private function setLastChange() : void {
+        $this->last_change = new DateTimeImmutable("now");
+    }
 }
 
 function insertEventInDb(PDO $dbh, Event $event) : void {
@@ -204,10 +217,10 @@ function insertEventInDb(PDO $dbh, Event $event) : void {
         $stmt = $dbh->prepare("
         INSERT INTO event (
         name, description, datetime_start, datetime_end, location,
-        created_by, approval_state, approved_by, datetime_creation, event_series)
+        created_by, approval_state, approved_by, datetime_creation, event_series, last_change)
         VALUES (
         :name, :description, :start, :end, :location, :created_by,
-        :approval_state, :approved_by, :creation_time, :series);");
+        :approval_state, :approved_by, :creation_time, :series, :last_change);");
 
         $stmt->execute(array(
             ":name" => $event->getName(),
@@ -219,11 +232,12 @@ function insertEventInDb(PDO $dbh, Event $event) : void {
             ":approval_state" => $event->getApprovalState(),
             ":approved_by" => $event->getApprovedBy(),
             ":creation_time" => $event->getCreateDate(),
-            ":series" => $event->getSeriesId()
+            ":series" => $event->getSeriesId(),
+            ":last_change" => $event->getLastChange()
         ));
         echo "Successfully submitted event!<br/>";
     } catch (PDOException $e) {
-        // printing detailed error to user might be bad, change this later?
+        // printing detailed error to user is bad, change this later!!!!!
         die("Error!: " . $e->getMessage() . "<br/>");
         //die("Sorry, something went wrong! Please try again.");
     }

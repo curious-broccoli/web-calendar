@@ -59,7 +59,7 @@ if ($approval_state === ApprovalState::Waiting) {
     // events that are waiting for approval need to be shown with their creator's username
     $sql = "SELECT u.name AS username, e.eventid, e.name, e.description,
     e.datetime_start, e.datetime_end, e.location,
-    e.created_by, e.approved_by, e.event_series
+    e.created_by, e.approved_by, e.event_series, e.last_change
     FROM event AS e
     JOIN user AS u
     ON e.created_by = u.userid
@@ -70,7 +70,7 @@ if ($approval_state === ApprovalState::Waiting) {
 }
 else {
     $sql = "SELECT eventid, name, description, datetime_start, datetime_end, location,
-    created_by, approved_by, event_series
+    created_by, approved_by, event_series, last_change
     FROM event
     WHERE approval_state = :approval_state
     AND datetime_start >= :start

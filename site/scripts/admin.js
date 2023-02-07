@@ -18,10 +18,32 @@ req.send();
 // load event
 function transferComplete(e) {
     if (this.status === 200) {
+        // TODO: react
+        console.log(200);
+    } else if (this.status === 409) {
+        // TODO: react
+        console.log(409);
+    } else {
+        // TODO: generic error and refresh?
+        console.log(this.status + ": unexpected error!");
     }
-    // if error (editing failed 400, ?, not enough permission 401/3 doesn't need a JS reaction)
-    //alert(this.responseText);
-    // generic error with status code?
+}
+
+function getCurrentEventParameters(eventid, action) {
+    const event = helper.getEventById(eventid);
+    const params = new URLSearchParams();
+    // for (const [key, value] of Object.entries(event)) {
+    //  // const dates = ["datetime_end", "datetime_start", "last_change", "datetime_creation"];
+    //     if (key === "datetime_end" || key === "datetime_start") {
+    //         params.set(key, value.toISOString());
+    //     } else {
+    //         params.set(key, value);
+    //     }
+    // }
+    params.set("last_change", event.last_change.toISOString());
+    params.set("eventid", eventid); // remove if I later get it from the edit form
+    params.set("action", action);
+    return params.toString();
 }
 
 // click event
@@ -30,11 +52,11 @@ function processEvent() {
     req.open("POST", "process-event.php?");
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     req.addEventListener("load", transferComplete);
-    const params = new URLSearchParams();
+
     const action = this.classList.contains("button-yes") ? "approve" : "reject";
-    params.set("action", action);
-    params.set("eventid", this.parentNode.dataset.eventid);
-    req.send(params.toString());
+    const eventid = Number(this.parentNode.dataset.eventid);
+    const params = getCurrentEventParameters(eventid, action);
+    req.send(params);
 }
 
 function makeProcessButton(type) {

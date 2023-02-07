@@ -5,11 +5,15 @@ export const getEvents = () => {
     if (sessionStorage.getItem("events") === null) {
         events = [];
     } else {
-        events = JSON.parse(sessionStorage.getItem("events"), (key, value) =>
-            key === "datetime_end" || key === "datetime_start"
-                ? new Date(value)
-                : value
-        );
+        events = JSON.parse(sessionStorage.getItem("events"), (key, value) => {
+            const dates = ["datetime_end", "datetime_start", "last_change", "datetime_creation"];
+            return dates.includes(key) ? new Date(value) : value;
+        });
     }
     return events;
+}
+
+export function getEventById(eventid) {
+    const events = getEvents();
+    return events.find((element) => element.eventid === eventid);
 }
