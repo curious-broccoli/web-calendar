@@ -54,7 +54,7 @@ function processEvent() {
     req.addEventListener("load", transferComplete);
 
     const action = this.classList.contains("button-yes") ? "approve" : "reject";
-    const eventid = Number(this.parentNode.dataset.eventid);
+    const eventid = Number(this.parentNode.parentNode.dataset.eventid);
     const params = getCurrentEventParameters(eventid, action);
     req.send(params);
     // TODO:
@@ -111,7 +111,7 @@ function showForm() {
 
 function makeNameEl(name) {
     const nameEl = document.createElement("button");
-    nameEl.classList.add("unprocessed-button");
+    nameEl.classList.add("show-event-form");
     nameEl.textContent = name;
     nameEl.addEventListener("click", showForm);
     return nameEl;
@@ -123,6 +123,34 @@ function makeUserEl(name) {
     return userEl;
 }
 
+function makeEventDataEl(event) {
+    const eventDataContainerEl = document.createElement("div");
+    eventDataContainerEl.classList.add("unprocessed-event-data");
+    // IMPORTANT INFO
+    // location
+    // description (careful, HTML!, but I might want to show as normal text)
+    // "and link to?"
+    eventDataContainerEl.appendChild(makeDateEl(event.datetime_start, event.datetime_end));
+    eventDataContainerEl.appendChild(makeNameEl(event.name));
+    // can I use flexbox to prevent using br?
+    eventDataContainerEl.appendChild(document.createElement("br"));
+
+    // more here
+    const placeholderEl = document.createElement("span");
+    placeholderEl.textContent = "placeholder";
+    eventDataContainerEl.appendChild(placeholderEl);
+    eventDataContainerEl.appendChild(makeUserEl(event.username));
+    return eventDataContainerEl;
+}
+
+function makeButtonsContainerEl() {
+    const buttonsContainerEl = document.createElement("span");
+    buttonsContainerEl.classList.add("state-buttons");
+    buttonsContainerEl.appendChild(makeProcessButton("approve"));
+    buttonsContainerEl.appendChild(makeProcessButton("reject"));
+    return buttonsContainerEl;
+}
+
 function start() {
     const listEl = document.querySelector("#unprocessed-container");
     const events = helper.getEvents();
@@ -131,22 +159,15 @@ function start() {
         const eventEl = document.createElement("div");
         eventEl.setAttribute("data-eventid", event.eventid);
         eventEl.classList.add(["unprocessed-event"]);
-        // IMPORTANT INFO
-        // location
-        // description (careful, HTML!, but I might want to show as normal text)
-        // "and link to?"
-        eventEl.appendChild(makeDateEl(event.datetime_start, event.datetime_end));
-        eventEl.appendChild(makeNameEl(event.name));
-        eventEl.appendChild(document.createElement("br"));
 
-        // more here
-        const placeholderEl = document.createElement("spann");
-        placeholderEl.textContent = "placeholder";
-        eventEl.appendChild(placeholderEl);
+        // event data
+        const eventDataEl = makeEventDataEl(event);
+        eventEl.appendChild(eventDataEl);
 
-        eventEl.appendChild(makeUserEl(event.username));
-        eventEl.appendChild(makeProcessButton("approve"));
-        eventEl.appendChild(makeProcessButton("reject"));
+        // buttons
+        const buttonsEl = makeButtonsContainerEl();
+        eventEl.appendChild(buttonsEl);
+
         listEl.appendChild(eventEl);
     });
 }

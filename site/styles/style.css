@@ -60,14 +60,16 @@ li.grid-content {
 div.event-container {
     overflow-y: auto;
     overflow-x: hidden;
-    height: 85%; /* kinda a hack to mostly fix the weird scroll */
+    height: 85%;
+    /* kinda a hack to mostly fix the weird scroll */
 }
 
 .first-day {
     grid-column-start: 2;
 }
 
-.calendar-grid, .popover li {
+.calendar-grid,
+.popover li {
     list-style-type: none;
 }
 
@@ -90,7 +92,7 @@ li.grid-header {
 }
 
 .calendar-header {
-    display:flex;
+    display: flex;
     font-weight: bold;
 }
 
@@ -121,6 +123,7 @@ ul.nav-bar {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    padding-bottom: 6px;
 }
 
 .nav-bar li {
@@ -129,26 +132,53 @@ ul.nav-bar {
 }
 
 /* ADMIN SITE */
-#unprocessed-container {
-    border-style: solid;
-    border-width: 0.5px;
-    width: 55%;
-    margin-left: 8px;
-    margin-top: 6px;
+.moderator-wrapper {
+    display: flex;
+    /* justify-content: ; */
 }
 
-.unprocessed-events div {
-    /* border-style: dashed;
-    border-width: 0.1px; */
-    margin-top: 4px;
+.moderator-wrapper>div {
+    border-style: solid;
+    border-width: 0.5px;
+    padding-top: 8px;
+    margin-bottom: 10px;
+}
+
+#unprocessed-container {
+    margin-left: 10px;
+    margin-right: 15px;
+}
+
+#admin-event-form {
+    margin-left: px;
+    margin-right: 10px;
+}
+
+#admin-event-form>*,
+#unprocessed-container>* {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.unprocessed-event {
+    display: flex;
+    justify-content: space-between;
+}
+
+.unprocessed-events>div {
     margin-bottom: 12px;
 }
 
+/* for gaps between the spans, but many elements in that div aren't span -> change css */
 .unprocessed-events span {
     margin: 3px;
 }
 
-.unprocessed-button {
+.state-buttons {
+    display: inline-grid;
+}
+
+.show-event-form {
     background: none !important;
     border: none;
     padding: 0 !important;
