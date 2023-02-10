@@ -22,7 +22,7 @@ class Event {
     private DateTimeImmutable $create_date;
     private DateTimeImmutable $last_change;
 
-    public function __construct($dbh) {
+    public function __construct(PDO $dbh, ?string $last_change = null) {
         // for creating a new event and not loading an event from DB
         // the order of execution matters
         $this->setName();
@@ -34,7 +34,7 @@ class Event {
         $this->setSeries();
         $this->setApprovedBy();
         $this->setCreateDate();
-        $this->setLastChange();
+        $this->setLastChange($last_change);
     }
 
     public function getName(): string {
@@ -207,8 +207,11 @@ class Event {
         $this->create_date = new DateTimeImmutable("now");
     }
 
-    private function setLastChange() : void {
-        $this->last_change = new DateTimeImmutable("now");
+    private function setLastChange($last_change) : void {
+        // if the event is a new event $last_change must be null
+        // if the event is from an event edit form and to be used for comparing the event,
+        // it must be the original event's last_change
+        $this->last_change = new DateTimeImmutable($last_change ?? "now");
     }
 }
 

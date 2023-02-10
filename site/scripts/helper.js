@@ -13,7 +13,23 @@ export const getEvents = () => {
     return events;
 }
 
+/**
+ *
+ * @param {int} eventid
+ * @returns {object}
+ */
 export function getEventById(eventid) {
     const events = getEvents();
     return events.find((element) => element.eventid === eventid);
+}
+
+/**
+ *
+ * @param {string} date date in ISO 8601
+ * @param {string} time hours and minutes in ISO 8601
+ */
+export function getUtcString(date, time) {
+    // create a date with the input interpreted as local time
+    const d = new Date(date + "T" + time);
+    return d.toISOString();
 }

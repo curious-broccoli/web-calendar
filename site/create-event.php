@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
-require_once __DIR__ . "/../src/flash_message.php";
+require_once __DIR__ . "/../src/error.php";
 require_once __DIR__ . "/../src/EventClass.php";
 
 define("FLASH_MESSAGE_NAME", "create_event_error_message");

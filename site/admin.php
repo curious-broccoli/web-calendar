@@ -11,14 +11,16 @@ session_start();
 
 block_unauthorized([Role::Approver, Role::Moderator], $dbh);
 $classes = "event-form moderator-event-form";
-$form = new EventForm($dbh, "edit", "create-event.php", true, $classes);
+$form = new EventForm($dbh, "edit", "process-event.php", true, $classes);
 ?>
 
 <div class="moderator-wrapper">
     <div id="unprocessed-container" class="unprocessed-events">
+        <span id="state-error" class="hidden error"></span>
     </div>
-    <div id="admin-event-form">
-        <?=$form->getHtml()?>
+    <div id="admin-form-wrapper" class="">
+        <span id="form-error" class="hidden error"></span>
+        <?= $form->getHtml() ?>
     </div>
 </div>
 

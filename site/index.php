@@ -4,7 +4,7 @@ $my_scripts = [
     ["name" => "index.js", "isModule" => false]
 ];
 include __DIR__ . "/../src/top.php";
-require_once __DIR__ . "/../src/flash_message.php";
+require_once __DIR__ . "/../src/error.php";
 session_start();
 if (isset($_SESSION["userid"])) {?>
     <span>logged in with userid <?=$_SESSION["userid"]?></span>

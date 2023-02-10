@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
-require_once __DIR__ . "/../src/flash_message.php";
+require_once __DIR__ . "/../src/error.php";
 
 function login_user(PDO $dbh, string $name, string $password) {
     if ( empty($name) || empty($password)) {

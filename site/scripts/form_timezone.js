@@ -1,4 +1,5 @@
 // JS for the creating a new event page
+import * as helper from "./helper.js";
 
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", handleTimezones);
@@ -8,10 +9,10 @@ else {
 }
 
 function getUtcInputElement(dateElement, timeElement, valueName) {
-    const dateTime = new Date(dateElement.value + "T" + timeElement.value).toISOString();
+    const utc = helper.getUtcString(dateElement.value, timeElement.value);
     const dateTimeElement = document.createElement("input");
     dateTimeElement.name = valueName;
-    dateTimeElement.value = dateTime;
+    dateTimeElement.value = utc;
     return dateTimeElement;
 }
 
@@ -24,10 +25,10 @@ function roundToFullHour(hoursToAdd = 1) {
 
 function handleTimezones() {
     const form = document.querySelector('form');
-    const dateStart = document.querySelector('#date_start');
-    const timeStart = document.querySelector('#time_start');
-    const dateEnd = document.querySelector('#date_end');
-    const timeEnd = document.querySelector('#time_end');
+    const dateStart = document.querySelector('#date-start');
+    const timeStart = document.querySelector('#time-start');
+    const dateEnd = document.querySelector('#date-end');
+    const timeEnd = document.querySelector('#time-end');
 
     // if it is e.g. 15:59 and changes to 16:00 between the 1st and 2nd time
     // this function is called then it will result in the default end time
@@ -35,7 +36,7 @@ function handleTimezones() {
     const startDefault = roundToFullHour();
     const endDefault = roundToFullHour(2);
     // Swedish locale easily sets it to the ISO 8601 format
-    // which is used by the "date" input element
+    // which is used by the date and time input element
     const locale = "sv";
     dateStart.value = startDefault.toLocaleDateString(locale);
     dateEnd.value = endDefault.toLocaleDateString(locale);

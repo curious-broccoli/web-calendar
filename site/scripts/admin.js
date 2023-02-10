@@ -4,78 +4,141 @@ function reqListener() {
     if (this.status === 200) {
         sessionStorage.setItem("events", this.responseText);
     }
+    else {
+        console.log("Failed loading events from server");
+    }
     start();
 }
 
 const req = new XMLHttpRequest();
+//req.responseType = "json";
 req.addEventListener("load", reqListener);
 const params = new URLSearchParams();
 params.set("state", 0);
 req.open("GET", "get-events.php?" + params, false);
 req.send();
 
+function makeErrorEl(id, text) {
+    const errorEl = document.createElement("span");
+    errorEl.id = id;
+    errorEl.textContent = text;
+}
+
+function hideErrors() {
+    const eventErrorEl = document.querySelector("#state-error");
+    eventErrorEl.textContent = "";
+    eventErrorEl.classList.add("hidden");
+    const formErrorEl = document.querySelector("#form-error");
+    formErrorEl.textContent = "";
+    formErrorEl.classList.add("hidden");
+}
 
 // load event
-function transferComplete(e) {
+function changeRequestComplete(e) {
+    // needs to tell which action failed or succeeded and which eventid
+    const data = this.response;
+    console.log(JSON.stringify(data));
+    alert(JSON.stringify(data));
+    return;
     if (this.status === 200) {
-        // TODO: react
-        console.log(200);
-    } else if (this.status === 409) {
-        // TODO: react
-        console.log(409);
+        // TODO: if no error, after hiding event data, load next event into form
+        if (data.action === "approve" || data.action === "reject") {
+            const eventEl = document.querySelector(`div[data-eventid="${data.eventid}"]`);
+            if ("error" in data) {
+                const errorEl = document.querySelector("#state-error");
+                errorEl.textContent = data.error;
+                errorEl.classList.remove("hidden");
+            }
+            else {
+                eventEl.classList.add("hidden");
+                // TODO: load next event into form
+            }
+        } else if (data.action.includes("edit")) {
+            // TODO: hide spinner
+
+            if ("error" in data) {
+                const errorEl = document.querySelector("#form-error");
+                errorEl.textContent = data.error;
+            } else {
+                // TODO: also hide event data
+            }
+        } else {
+            // show error to user?
+            console.log(data);
+        }
+        console.log(data);
     } else {
-        // TODO: generic error and refresh?
-        console.log(this.status + ": unexpected error!");
+        console.log(`Change request responded with error:\n${this.status} ${this.responseText}`);
     }
 }
 
-function getCurrentEventParameters(eventid, action) {
-    const event = helper.getEventById(eventid);
-    const params = new URLSearchParams();
-    // for (const [key, value] of Object.entries(event)) {
-    //  // const dates = ["datetime_end", "datetime_start", "last_change", "datetime_creation"];
-    //     if (key === "datetime_end" || key === "datetime_start") {
-    //         params.set(key, value.toISOString());
-    //     } else {
-    //         params.set(key, value);
-    //     }
-    // }
-    params.set("last_change", event.last_change.toISOString());
-    params.set("eventid", eventid); // remove if I later get it from the edit form
-    params.set("action", action);
-    return params.toString();
-}
-
-// click event
-function processEvent() {
+function postRequest(params) {
+    // TODO: what if reject/approve is clicked while the form is open with another event
     const req = new XMLHttpRequest();
     req.open("POST", "process-event.php?");
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    req.addEventListener("load", transferComplete);
+    req.responseType = "json";
+    req.addEventListener("load", changeRequestComplete);
+    // how to test?
+    req.addEventListener("error", () => alert("Request failed!\nPlease reload the page"));
+    console.log(params);
+    req.send(params); // does this need to be params.toString()?
 
-    const action = this.classList.contains("button-yes") ? "approve" : "reject";
-    const eventid = Number(this.parentNode.parentNode.dataset.eventid);
-    const params = getCurrentEventParameters(eventid, action);
-    req.send(params);
     // TODO:
     // hide form
+    // hide event element
+    // hide errors?
+}
+
+// this is triggered by approve/reject buttons and form buttons
+function handleSubmit(e) {
+    // TODO:
+    // if only edited, update the event(last_change) that was edited so it can be approved
+    // or simply refresh all events and DOM after a successful edit?
+    // should buttons be disabled while waiting for edit request to finish?
+    // can I use the event's "submitter" property?
+    e.preventDefault();
+
+
+    const params = new URLSearchParams();
+    let eventid;
+
+    if (e.target.classList.contains("button-approve") || e.target.classList.contains("button-reject")) {
+        const action = e.target.classList.contains("button-approve") ? "approve" : "reject";
+        params.set("action", action);
+        eventid = e.target.parentNode.parentNode.dataset.eventid;
+    } else { // should I check here if it is really the form's button?
+        params.set("action", e.target.id);
+        const formParams = new URLSearchParams(new FormData(e.target.form));
+        const formattedFormParams = makeUtcParams(formParams);
+        for (const [key, val] of formattedFormParams.entries()) {
+            params.set(key, val);
+        }
+        eventid = e.target.form.dataset.eventid;
+    }
+    params.set("eventid", eventid);
+    const event = helper.getEventById(Number(eventid));
+    params.set("last_change", event.last_change.toISOString());
+    hideErrors();
+
+    postRequest(params);
 }
 
 function makeProcessButton(type) {
     const button = document.createElement("button");
-    button.addEventListener("click", processEvent);
+    button.addEventListener("click", handleSubmit)
     let text;
     let classes;
     if (type === "approve") {
-        classes = ["button-yes"];
+        classes = ["button-yes", "button-approve"];
         text = "Approve";
     }
     else {
-        classes = ["button-no"];
+        classes = ["button-no", "button-reject"];
         text = "Reject";
     }
     button.textContent = text;
-    button.classList.add(classes);
+    button.classList.add(...classes);
     return button;
 }
 
@@ -96,17 +159,65 @@ function makeDateEl(start, end) {
     return dateEl;
 }
 
-// should it be a toggle?
+/**
+ * @param {URLSearchParams} urlParams
+ */
+function makeUtcParams(urlParams) {
+    const startUtc = helper.getUtcString(urlParams.get("date_start"), urlParams.get("time_start"));
+    urlParams.set("datetime_start", startUtc);
+    const endUtc = helper.getUtcString(urlParams.get("date_end"), urlParams.get("time_end"));
+    urlParams.set("datetime_end", endUtc);
+    urlParams.delete("date_start");
+    urlParams.delete("time_start");
+    urlParams.delete("date_end");
+    urlParams.delete("time_end");
+    return urlParams
+}
+
+function getDateTimeValuesForInput(event) {
+    const locale = "sv"; // for ISO 8601 format
+    const options = { timeStyle: "short" };
+    const formatted = {
+        date_start: event.datetime_start.toLocaleDateString(locale),
+        time_start: event.datetime_start.toLocaleTimeString(locale, options),
+        date_end: event.datetime_end.toLocaleDateString(locale),
+        time_end: event.datetime_end.toLocaleTimeString(locale, options)
+    }
+    return formatted;
+}
+
+function fillForm(event) {
+    document.querySelector("#name").value = event.name;
+    document.querySelector("#location").value = event.location;
+
+    const formattedValues = getDateTimeValuesForInput(event);
+    document.querySelector("#date-start").value = formattedValues.date_start;
+    document.querySelector("#time-start").value = formattedValues.time_start;
+    document.querySelector("#date-end").value = formattedValues.date_end;
+    document.querySelector("#time-end").value = formattedValues.time_end;
+
+    document.querySelector("#description").textContent = event.description;
+    document.querySelector("#series").value = event.event_series ?? "";
+}
+
 function showForm() {
     // TODO:
-    // if moderator but not if approver?
-    // show form
-    // FormData API ?
-    // fill with values
+    // if moderator but not if approver? or disable
 
     // should the calendar event be passed to here as argument or should
     // I get it using its ID?
-    alert("button clicked");
+    const eventid = Number(this.parentNode.parentNode.dataset.eventid);
+    const event = helper.getEventById(Number(eventid));
+    if (event === undefined) {
+        return;
+    }
+    fillForm(event);
+    const form = document.querySelector("#form");
+    form.dataset.eventid = eventid;
+    form.querySelectorAll("[type=submit]").forEach((button) => button.addEventListener("click", handleSubmit));
+    //form.addEventListener("submit", onFormSubmit); to prevent default?
+
+    const formWrapper = document.querySelector("#admin-form-wrapper");
 }
 
 function makeNameEl(name) {

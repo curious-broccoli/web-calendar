@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/../src/dbconnection.php";
-require_once __DIR__ . "/../src/flash_message.php";
+require_once __DIR__ . "/../src/error.php";
 require_once __DIR__ . "/../src/Role.php";
 
 function is_valid_password(string $passwordCandidate, string $name) {

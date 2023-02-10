@@ -19,7 +19,7 @@ class EventForm {
         else {
             throw new InvalidArgumentException("Please enter a valid target");
         }
-        // no value checking implemented here
+        // no value checking is implemented here
         $this->dbh = $dbh;
         $this->action = $action;
         $this->showCaptcha = $showCaptcha;
@@ -27,27 +27,27 @@ class EventForm {
     }
 
     private function makeFormStart() : void { ?>
-        <form action="<?=$this->action?>" method="post" class="<?=$this->classes?>">
+        <form action="<?=$this->action?>" method="post" id="form" class="<?=$this->classes?>">
     <?php
     }
 
     private function makeNormalInputs() : void { ?>
-        <input type="text" name="name" placeholder="Event name" required autofocus /><br />
-        <input type="text" name="location" placeholder="Location" required /><br />
+        <input type="text" id="name" name="name" placeholder="Event name" required autofocus /><br />
+        <input type="text" id="location" name="location" placeholder="Location" required /><br />
         Start<br />
-        <input type="date" id="date_start" name="date_start" required />
-        <input type="time" id="time_start" name="time_start" required /><br />
+        <input type="date" id="date-start" name="date_start" required />
+        <input type="time" id="time-start" name="time_start" required /><br />
         End<br />
-        <input type="date" id="date_end" name="date_end" required />
-        <input type="time" id="time_end" name="time_end" required /><br />
-        <textarea name="description" rows="5" cols="31" placeholder="Description"></textarea><br />
+        <input type="date" id="date-end" name="date_end" required />
+        <input type="time" id="time-end" name="time_end" required /><br />
+        <textarea id="description" name="description" rows="5" cols="31" placeholder="Description"></textarea><br />
     <?php
     }
 
     private function makeSeriesInput() : void {
         $series = $this->dbh->query("SELECT seriesid, name FROM event_series;");?>
 
-        <select name="series">
+        <select id="series" name="series">
             <option value="">Event series</option>
             <?php
             foreach ($series as $row) { ?>
@@ -66,10 +66,15 @@ class EventForm {
         }
     }
 
-    private function makeButtons() : void { ?>
-        <input type="submit" name="submit" value="Submit!" />
-    <?php
-        // TODO: wrapper and other button?
+    private function makeButtons() : void {
+        if ($this->target === "create") { ?>
+            <input type="submit" name="submit" value="Submit" />
+        <?php
+        } else if ($this->target === "edit") { ?>
+            <input type="submit" id="edit" name="edit" value="Edit" />
+            <input type="submit" id="edit-approve" name="edit-approve" value="Edit & Approve" />
+        <?php
+        }
     }
 
     private function makeFormEnd() : void { ?>
