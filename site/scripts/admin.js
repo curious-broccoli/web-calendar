@@ -11,20 +11,14 @@ function reqListener() {
 }
 
 const req = new XMLHttpRequest();
-//req.responseType = "json";
 req.addEventListener("load", reqListener);
 const params = new URLSearchParams();
+// change here later to implement event filter
 params.set("state", 0);
-req.open("GET", "get-events.php?" + params, false);
+req.open("GET", "get-events.php?" + params);
 req.send();
 
-function makeErrorEl(id, text) {
-    const errorEl = document.createElement("span");
-    errorEl.id = id;
-    errorEl.textContent = text;
-}
-
-function hideErrors() {
+function clearErrors() {
     const eventErrorEl = document.querySelector("#state-error");
     eventErrorEl.textContent = "";
     eventErrorEl.classList.add("hidden");
@@ -38,8 +32,6 @@ function changeRequestComplete(e) {
     // needs to tell which action failed or succeeded and which eventid
     const data = this.response;
     console.log(JSON.stringify(data));
-    alert(JSON.stringify(data));
-    return;
     if (this.status === 200) {
         // TODO: if no error, after hiding event data, load next event into form
         if (data.action === "approve" || data.action === "reject") {
@@ -50,7 +42,7 @@ function changeRequestComplete(e) {
                 errorEl.classList.remove("hidden");
             }
             else {
-                eventEl.classList.add("hidden");
+
                 // TODO: load next event into form
             }
         } else if (data.action.includes("edit")) {
@@ -75,6 +67,8 @@ function changeRequestComplete(e) {
 
 function postRequest(params) {
     // TODO: what if reject/approve is clicked while the form is open with another event
+    // to prevent the user from approving/rejecting wrong event
+
     const req = new XMLHttpRequest();
     req.open("POST", "process-event.php?");
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -83,7 +77,7 @@ function postRequest(params) {
     // how to test?
     req.addEventListener("error", () => alert("Request failed!\nPlease reload the page"));
     console.log(params);
-    req.send(params); // does this need to be params.toString()?
+    req.send(params);
 
     // TODO:
     // hide form
@@ -100,27 +94,28 @@ function handleSubmit(e) {
     // can I use the event's "submitter" property?
     e.preventDefault();
 
-
     const params = new URLSearchParams();
     let eventid;
 
-    if (e.target.classList.contains("button-approve") || e.target.classList.contains("button-reject")) {
-        const action = e.target.classList.contains("button-approve") ? "approve" : "reject";
+    if (e.currentTarget.classList.contains("button-approve") || e.currentTarget.classList.contains("button-reject")) {
+        const action = e.currentTarget.classList.contains("button-approve") ? "approve" : "reject";
         params.set("action", action);
-        eventid = e.target.parentNode.parentNode.dataset.eventid;
+        eventid = e.currentTarget.parentNode.parentNode.dataset.eventid;
+        e.currentTarget.parentNode.parentNode.classList.add("hidden");
+        updateForm();
     } else { // should I check here if it is really the form's button?
-        params.set("action", e.target.id);
-        const formParams = new URLSearchParams(new FormData(e.target.form));
+        params.set("action", e.currentTarget.id);
+        const formParams = new URLSearchParams(new FormData(e.currentTarget.form));
         const formattedFormParams = makeUtcParams(formParams);
         for (const [key, val] of formattedFormParams.entries()) {
             params.set(key, val);
         }
-        eventid = e.target.form.dataset.eventid;
+        eventid = e.currentTarget.form.dataset.eventid;
     }
     params.set("eventid", eventid);
     const event = helper.getEventById(Number(eventid));
     params.set("last_change", event.last_change.toISOString());
-    hideErrors();
+    clearErrors();
 
     postRequest(params);
 }
@@ -201,56 +196,60 @@ function fillForm(event) {
     document.querySelector("#series").value = event.event_series ?? "";
 }
 
-function showForm() {
+function updateForm(e) {
     // TODO:
     // if moderator but not if approver? or disable
 
-    // should the calendar event be passed to here as argument or should
-    // I get it using its ID?
-    const eventid = Number(this.parentNode.parentNode.dataset.eventid);
-    const event = helper.getEventById(Number(eventid));
-    if (event === undefined) {
-        return;
-    }
-    fillForm(event);
+    const eventid = (function getEventId() {
+        // for when I explicitly call the function without an event
+        if (e === undefined) {
+            const allEvents = document.querySelectorAll(".unprocessed-event");
+            const eventEl = Array.from(allEvents).find(node => !node.classList.contains("hidden"));
+            return eventEl.dataset.eventid;
+        } else {
+            return e.currentTarget.parentNode.dataset.eventid;
+        }
+    })();
+
     const form = document.querySelector("#form");
+    // to show the user if something went wrong
+    if (eventid === undefined) {
+        form.reset();
+    }
+    const event = helper.getEventById(Number(eventid));
+    fillForm(event);
+
     form.dataset.eventid = eventid;
     form.querySelectorAll("[type=submit]").forEach((button) => button.addEventListener("click", handleSubmit));
-    //form.addEventListener("submit", onFormSubmit); to prevent default?
-
-    const formWrapper = document.querySelector("#admin-form-wrapper");
 }
 
 function makeNameEl(name) {
-    const nameEl = document.createElement("button");
-    nameEl.classList.add("show-event-form");
+    const nameEl = document.createElement("span");
+    nameEl.classList.add("event-name");
     nameEl.textContent = name;
-    nameEl.addEventListener("click", showForm);
     return nameEl;
 }
 
 function makeUserEl(name) {
     const userEl = document.createElement("span");
-    userEl.textContent = `[by ${name}]`; // should it be in squared braces?
+    userEl.textContent = `[by ${name}]`; // should it be shown? in squared braces?
     return userEl;
 }
 
 function makeEventDataEl(event) {
-    const eventDataContainerEl = document.createElement("div");
+    const eventDataContainerEl = document.createElement("button");
     eventDataContainerEl.classList.add("unprocessed-event-data");
+    eventDataContainerEl.addEventListener("click", updateForm);
     // IMPORTANT INFO
-    // location
     // description (careful, HTML!, but I might want to show as normal text)
-    // "and link to?"
     eventDataContainerEl.appendChild(makeDateEl(event.datetime_start, event.datetime_end));
     eventDataContainerEl.appendChild(makeNameEl(event.name));
-    // can I use flexbox to prevent using br?
+    // better way than <br>?
     eventDataContainerEl.appendChild(document.createElement("br"));
 
-    // more here
-    const placeholderEl = document.createElement("span");
-    placeholderEl.textContent = "placeholder";
-    eventDataContainerEl.appendChild(placeholderEl);
+    const locationEl = document.createElement("span");
+    locationEl.textContent = event.location;
+    eventDataContainerEl.appendChild(locationEl);
     eventDataContainerEl.appendChild(makeUserEl(event.username));
     return eventDataContainerEl;
 }
@@ -282,5 +281,6 @@ function start() {
 
         listEl.appendChild(eventEl);
     });
+    updateForm();
 }
 

@@ -179,17 +179,21 @@ ul.nav-bar {
     display: inline-grid;
 }
 
-.show-event-form {
-    background: none !important;
+/* https: //css-tricks.com/overriding-default-button-styles/ */
+.unprocessed-event-data {
+    display: inline-block;
     border: none;
-    padding: 0 !important;
-    /*optional*/
-    font-family: arial, sans-serif;
-    /*input has OS specific font-family*/
-    color: #069;
-    text-decoration: underline;
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    /*background-color: inherit;*/
+    font-size: 1rem;
     cursor: pointer;
-    color: black;
+    text-align: left;
+    transition: background 250ms ease-in-out,
+        transform 150ms ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 .button-yes {
@@ -198,6 +202,10 @@ ul.nav-bar {
 
 .button-no {
     background-color: var(--reject-color);
+}
+
+.event-name {
+    font-weight: bolder;
 }
 
 .hidden {
