@@ -63,13 +63,13 @@ function attempt_edit(PDO $dbh, Event $edited_event) : bool {
 function handle_edit_request(PDO $dbh) : void {
     try {
         $edited_event = new Event($dbh, $_POST["last_change"]);
-    } catch (Exception $e) {
+    } catch (EventException $e) {
         quit([
             "action" => $_POST["action"],
             "eventid" => $_POST["eventid"],
             "error" => $e->getMessage()
         ]);
-    } catch (Error $e) {
+    } catch (Throwable $e) {
         quit([
             "action" => $_POST["action"],
             "eventid" => $_POST["eventid"],

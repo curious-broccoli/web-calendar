@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * for errors that should be shown to website user
+ */
+class EventException extends Exception {
+    // Redefine the exception so message isn't optional
+    public function __construct($message, $code = 0, Throwable $previous = null) {
+        // some code
+
+        // make sure everything is assigned properly
+        parent::__construct($message, $code, $previous);
+    }
+
+    // custom string representation of object
+    public function __toString() {
+        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+    }
+}
+
+
 enum ApprovalState: int {
     case Waiting = 0;
     case Approved = 1;
@@ -98,14 +117,14 @@ class Event {
         // TODO: argument to strip like emojis and weird stuff (before or after html?)
         $string = $_POST[$var_name];
         if (empty($string) && !$allowEmpty) {
-            throw new Exception("Please enter a " . $var_name . " value!");
+            throw new EventException("Please enter a " . $var_name . " value!");
         }
         if (!$allowHtml) {
             $string = strip_tags($string);
             // checks if whole string got deleted by stripping
             // so user would not get confused by more generic error
             if (empty($string) && !$allowEmpty) {
-                throw new Exception("Please enter a " . $var_name . " value without HTML!");
+                throw new EventException("Please enter a " . $var_name . " value without HTML!");
             }
         }
 
@@ -129,7 +148,7 @@ class Event {
             return DateTimeImmutable::createFromFormat(self::DATEFORMAT, $date_string);
         }
         else {
-            throw new Exception("Please enter valid start and end values!");
+            throw new EventException("Please enter valid start and end values!");
         }
     }
 

@@ -57,7 +57,7 @@ final class EventCreationTest extends TestCase {
         // test that name must exist
         $this->initPost("", "testLocation", "testDesc", "2000-12-12T12:12:12.000Z", "1999-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $this->expectException(Exception::class);
+        $this->expectException(EventException::class);
         // if message contains
         $this->expectExceptionMessage("name value");
         $event = new Event($this->getDbh());
@@ -80,7 +80,7 @@ final class EventCreationTest extends TestCase {
         // test that it throws an exception after stripping the whole location
         $this->initPost("<b>name", "<script></script>", "testDesc", "2000-12-12T12:12:12.000Z", "1999-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $this->expectException(Exception::class);
+        $this->expectException(EventException::class);
         $this->expectExceptionMessage("location value");
         $event = new Event($this->getDbh());
     }
@@ -96,7 +96,7 @@ final class EventCreationTest extends TestCase {
         // test that invalid dates aren't accepted
         $this->initPost("name", "location", "testDesc", "2000-12-32T12:12:12.000Z", "1999-12-12T12:12:12.000Z", "");
         $this->initSession();
-        $this->expectException(Exception::class);
+        $this->expectException(EventException::class);
         $this->expectExceptionMessage("start and end value");
         $event = new Event($this->getDbh());
     }

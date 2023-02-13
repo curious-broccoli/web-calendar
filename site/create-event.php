@@ -9,13 +9,12 @@ define("ERROR_REDIRECT_LOCATION", "/new-event.php");
 session_start();
 try {
     $event = new Event($dbh);
-} catch (Exception $e) {
+} catch (EventException $e) {
     error_and_redirect($e->getMessage());
-}
-catch (Error $e) {
+} catch (Throwable $e) {
     // TODO: don't give details to user
-    //error_and_redirect("Fatal error!");
-    error_and_redirect("Fatal error: " . $e->getMessage());
+    error_and_redirect("Fatal error!");
+    //error_and_redirect("Fatal error: " . $e->getMessage());
 }
 insertEventInDb($dbh, $event);
 
