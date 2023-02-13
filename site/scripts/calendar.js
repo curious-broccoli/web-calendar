@@ -149,7 +149,7 @@ class MonthView extends View {
         const div = document.createElement("div");
         div.className += "event";
         div.setAttribute("data-eventid", e.eventid);
-        div.setAttribute("data-toggle", "popover");
+        div.setAttribute("data-bs-toggle", "popover");
         const locale = navigator.language;
         const options = { timeStyle: "short" };
         div.textContent = e.datetime_start.toLocaleTimeString(locale, options) + " " + e.name;
@@ -208,48 +208,52 @@ class MonthView extends View {
 
     // trigger: click means you have to press on the trigger element again to close it and multiple popovers can be opened
     // trigger: focus means you clicking in the popover closes it (bad, probably)
-    // -> read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
+    // -> maybe read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
     makePopovers() {
-        $('[data-toggle="popover"]').popover({
-            html: true,
-            placement: "auto",
-            trigger: "click",
-            title: function () {
-                const event = helper.getEventById(+this.dataset.eventid);
-                const text = document.createTextNode(event.name);
-                return text;
-            },
-            content: function () {
-                const event = helper.getEventById(+this.dataset.eventid);
-                const data = {
-                    name: {
-                        label: "Title", value: event.name, allowHtml: false
-                    },
-                    start: {
-                        label: "Start", value: formatDate(event.datetime_start), allowHtml: false
-                    },
-                    end: {
-                        label: "End", value: formatDate(event.datetime_end), allowHtml: false
-                    },
-                    location: {
-                        label: "Location", value: event.location, allowHtml: false
-                    },
-                    description: {
-                        label: "Description", value: event.description, allowHtml: true
-                    }
-                };
-                const list = document.createElement("ol");
-                list.className = "popover-grid";
-                Object.values(data).forEach(property => {
-                    // the label should never be HTML data so I do not pass in
-                    // the allowHtml argument
-                    const label = createListElement(property.label + ":", ["popover-data-left"]);
-                    list.appendChild(label);
-                    const value = createListElement(property.value, ["popover-data-right"], property.allowHtml);
-                    list.appendChild(value);
-                })
-                return list;
-            },
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+        const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => {
+            const event = helper.getEventById(+popoverTriggerEl.dataset.eventid);
+            const options = {
+                html: true,
+                placement: "auto",
+                trigger: "click",
+                //trigger: "hover focus",
+                title: function () {
+                    return document.createTextNode(event.name);
+                },
+                content: function () {
+                    const data = {
+                        name: {
+                            label: "Title", value: event.name, allowHtml: false
+                        },
+                        start: {
+                            label: "Start", value: formatDate(event.datetime_start), allowHtml: false
+                        },
+                        end: {
+                            label: "End", value: formatDate(event.datetime_end), allowHtml: false
+                        },
+                        location: {
+                            label: "Location", value: event.location, allowHtml: false
+                        },
+                        description: {
+                            label: "Description", value: event.description, allowHtml: true
+                        }
+                    };
+                    const list = document.createElement("ol");
+                    list.className = "popover-grid";
+                    Object.values(data).forEach(property => {
+                        // the label should never/can't be HTML data so I do not pass in
+                        // the allowHtml argument
+                        const label = createListElement(property.label + ":", ["popover-data-left"]);
+                        list.appendChild(label);
+                        const value = createListElement(property.value, ["popover-data-right"], property.allowHtml);
+                        list.appendChild(value);
+                    })
+                    return list;
+                },
+            }
+
+            new bootstrap.Popover(popoverTriggerEl, options);
         });
     }
 }
