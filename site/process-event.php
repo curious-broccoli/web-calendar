@@ -60,47 +60,6 @@ function attempt_edit(PDO $dbh, Event $edited_event) : bool {
     return $stmt->rowCount();
 }
 
-/**
- * returns true if any event field is different in the edited version
- */
-function is_different_data(Event $edited_event, array $old_event) : bool {
-    return $edited_event->getName() !== $old_event["name"] ||
-        $edited_event->getLocation() !== $old_event["location"] ||
-        $edited_event->getStart() !== $old_event["datetime_start"] ||
-        $edited_event->getEnd() !== $old_event["datetime_end"] ||
-        $edited_event->getDescription() !== $old_event["description"] ||
-        $edited_event->getSeriesId() != $old_event["event_series"];
-}
-
-/**
- * returns array with keys for all the changed values
- */
-function get_old_event_data(PDO $dbh) : array {
-    $sql = "SELECT
-    name, location, datetime_start, datetime_end, description, event_series
-    FROM event
-    WHERE
-        eventid = :eventid
-        AND last_change = :last_change;";
-
-    $stmt = $dbh->prepare($sql);
-    $parameters = array(
-        ":eventid" => $_POST["eventid"],
-        ":last_change" => $_POST["last_change"]
-    );
-    $stmt->execute($parameters);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$result) {
-        quit([
-            "action" => $_POST["action"],
-            "eventid" => $_POST["eventid"],
-            "error" => "Failed to change out-of-date event's values. Please refresh the data."
-        ]);
-    }
-    return $result;
-}
-
 function handle_edit_request(PDO $dbh) : void {
     try {
         $edited_event = new Event($dbh, $_POST["last_change"]);
@@ -118,28 +77,17 @@ function handle_edit_request(PDO $dbh) : void {
         ]);
     }
 
-    $old_data = get_old_event_data($dbh);
-    if (is_different_data($edited_event, $old_data)) {
-        $success = attempt_edit($dbh, $edited_event);
-        if ($success) {
-            quit([
-                "action" => $_POST["action"],
-                "eventid" => $_POST["eventid"]
-            ]);
-        } else {
-            quit([
-                "action" => $_POST["action"],
-                "eventid" => $_POST["eventid"],
-                "error" => "Failed to change out-of-date event's values. Please refresh the data."
-            ]);
-        }
+    $success = attempt_edit($dbh, $edited_event);
+    if ($success) {
+        quit([
+            "action" => $_POST["action"],
+            "eventid" => $_POST["eventid"]
+        ]);
     } else {
-        // make it approve without edit, if "edit-approve"
-        // call the state function instead?
         quit([
             "action" => $_POST["action"],
             "eventid" => $_POST["eventid"],
-            "error" => "just approve"
+            "error" => "Failed to change out-of-date event's values. Please refresh the data."
         ]);
     }
 }
@@ -166,7 +114,7 @@ function attempt_state_change(PDO $dbh) : bool {
             AND last_change = :old_last_change;";
 
     $stmt = $dbh->prepare($sql_change_state);
-    if ($_POST["action"] === "approve") {
+    if ($_POST["action"] === "approve" || $_POST["action"] === "edit-approve") {
         $new_state = ApprovalState::Approved;
     } elseif ($_POST["action"] === "reject") {
         $new_state = ApprovalState::Rejected;
@@ -200,13 +148,13 @@ function handle_state_request(PDO $dbh) : void {
 }
 
 function check_missing_params() : void {
-    // parameters from edit form will be checked by trying to create a new event
+    // parameters from edit form will later be checked by trying to create a new event
     $required_params = ["action", "eventid", "last_change"];
     foreach ($required_params as $param) {
         if (!isset($_POST[$param])) {
             quit([
                 "action" => $_POST["action"],
-                "error" => "Missing parameter " . $param
+                "error" => "Missing parameter " . $param . " ."
             ]);
         }
     }
@@ -217,33 +165,34 @@ function process_request(PDO $dbh) : void {
 
     if ($_POST["action"] === "approve" || $_POST["action"] === "reject") {
         handle_state_request($dbh);
-
-    // TODO: stop approver from accessing -> only allow moderator
     } elseif ($_POST["action"] === "edit" || $_POST["action"] === "edit-approve") {
-        handle_edit_request($dbh);
+        $role = get_user_role($_SESSION["userid"], $dbh);
+        if ($role === Role::Moderator) {
+            handle_edit_request($dbh);
+        } elseif ($_POST["action"] === "edit-approve") {
+            handle_state_request($dbh);
+        } else {
+            quit([
+                "action" => $_POST["action"],
+                "error" => "Insufficient permissions for editing."
+            ]);
+        }
     } else {
         quit([
             "action" => $_POST["action"],
-            "error" => "Invalid action parameter"
+            "error" => "Invalid action parameter."
         ]);
     }
 }
 
 $allowed_roles = [Role::Approver, Role::Moderator];
 block_unauthorized($allowed_roles, $dbh);
-// TODO
-// if the event was edited and approved, edit the event in DB
-// for that make a Event::fromDB method, a method to compare both events for equality and then edit if different?
-// if approver, can't edit
 
 process_request($dbh);
 
-$response = [
+echo json_encode([
     "action" => $_POST["action"],
-    "error" => "some error.",
-    "eventid" => $_POST["eventid"]
-];
-echo json_encode($response);
-
+    "error" => "Something went wrong. Please refresh the data.",
+    "eventid" => $_POST["eventid"]]);
 
 ?>

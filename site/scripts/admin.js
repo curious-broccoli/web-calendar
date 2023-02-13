@@ -55,6 +55,7 @@ function changeRequestComplete(e) {
             }
         } else if (data.action.includes("edit")) {
             // TODO: hide spinner
+            // if just edit, gotta reload or something
 
             if ("error" in data) {
                 const errorEl = document.querySelector("#form-error");
@@ -196,7 +197,7 @@ function fillForm(event) {
     document.querySelector("#date-end").value = formattedValues.date_end;
     document.querySelector("#time-end").value = formattedValues.time_end;
 
-    document.querySelector("#description").textContent = event.description;
+    document.querySelector("#description").value = event.description;
     document.querySelector("#series").value = event.event_series ?? "";
 }
 
