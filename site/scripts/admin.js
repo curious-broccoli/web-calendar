@@ -52,6 +52,12 @@ function setButtonsDisabled(newState) {
         });
 }
 
+function onEditTimeout() {
+    setButtonsDisabled(false);
+    showError("#form-error", "Request took too long. Please try again.");
+    document.querySelector("#spinner").classList.add("hidden");
+}
+
 // load event
 function changeRequestComplete() {
     if (this.status === 200) {
@@ -86,6 +92,10 @@ function postRequest(params) {
     const req = new XMLHttpRequest();
     req.open("POST", "process-event.php?");
     // IF PARAMS.ACTION INCLUDES EDIT -> set timeout x, add event listener
+    if (params.get("action").includes("edit")) {
+        req.timeout = 20000;
+        req.addEventListener("timeout", onEditTimeout);
+    }
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     req.responseType = "json";
     req.addEventListener("load", changeRequestComplete);
