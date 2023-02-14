@@ -1,6 +1,6 @@
 import * as helper from "./helper.js";
 
-function reqListener() {
+function eventsLoaded() {
     if (this.status === 200) {
         sessionStorage.setItem("events", this.responseText);
     }
@@ -11,7 +11,7 @@ function reqListener() {
 }
 
 const req = new XMLHttpRequest();
-req.addEventListener("load", reqListener);
+req.addEventListener("load", eventsLoaded);
 const params = new URLSearchParams();
 // change here later to implement event filter
 params.set("state", 0);

@@ -1,8 +1,13 @@
 import * as helper from "./helper.js";
 
-function reqListener () {
-    // TODO: if response OK
-    sessionStorage.setItem("events", this.responseText);
+function eventsLoaded () {
+    if (this.status === 200) {
+        sessionStorage.setItem("events", this.responseText);
+    }
+    else {
+        console.log("Failed loading events from server");
+    }
+    start();
 }
 
 //EVENTS SHOULD maybe ONLY BE REQUESTED THE FIRST TIME AND ON EXPLICIT REFRESH REQUEST IN GUI
@@ -11,11 +16,11 @@ function reqListener () {
 // maybe move this into a method requestEvents() of the view class
 // to then use the view's selected date after creating view instance
 const req = new XMLHttpRequest();
-req.addEventListener("load", reqListener);
+req.addEventListener("load", eventsLoaded);
 // if it's async it will try to draw before loading
 const params = new URLSearchParams();
 params.set("state", 1);
-req.open("GET", "get-events.php?" + params.toString(), false);
+req.open("GET", "get-events.php?" + params);
 req.send();
 
 // I would put the functions below for popovers in the View class but
@@ -70,7 +75,7 @@ class View {
         const grid = document.querySelector("#" + View.calendarGrid);
         grid.replaceChildren();
 
-        // how can I call a popover's methods like hide()? getInstance()?
+        // how can I call a popover's methods like hide() -> bootstrap.popover.getInstance()?
         document.querySelectorAll(".popover").forEach((popover) => popover.remove());
     }
 }
@@ -271,13 +276,6 @@ function draw() {
     v.drawGridHeader();
     v.drawGrid();
     v.makePopovers();
-}
-
-if (document.readyState === "loading") {  // Loading hasn't finished yet
-        document.addEventListener("DOMContentLoaded", start);
-}
-else {
-    start();
 }
 
 //rename to something better
