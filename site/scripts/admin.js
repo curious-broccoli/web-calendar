@@ -27,41 +27,41 @@ function clearErrors() {
     formErrorEl.classList.add("hidden");
 }
 
-// load event
-function changeRequestComplete(e) {
-    // needs to tell which action failed or succeeded and which eventid
-    const data = this.response;
-    console.log(JSON.stringify(data));
-    if (this.status === 200) {
-        // TODO: if no error, after hiding event data, load next event into form
-        if (data.action === "approve" || data.action === "reject") {
-            const eventEl = document.querySelector(`div[data-eventid="${data.eventid}"]`);
-            if ("error" in data) {
-                const errorEl = document.querySelector("#state-error");
-                errorEl.textContent = data.error;
-                errorEl.classList.remove("hidden");
-            }
-            else {
+function showError(elementId, error) {
+    const errorEl = document.querySelector(elementId);
+    errorEl.textContent = error;
+    errorEl.classList.remove("hidden");
+}
 
-                // TODO: load next event into form
+function setButtonsDisabled(newState) {
+    const allButtons = document.querySelectorAll("button, input[type=submit]");
+    allButtons.forEach((button) => button.disabled = newState);
+}
+
+// load event
+function changeRequestComplete() {
+    if (this.status === 200) {
+        const data = this.response;
+        if (data.action === "approve" || data.action === "reject") {
+            if ("error" in data) {
+                showError("#state-error", data.error);
             }
         } else if (data.action.includes("edit")) {
-            // TODO: hide spinner
-            // if just edit, gotta reload or something
-
+            document.querySelector("#spinner").classList.add("hidden");
+            setButtonsDisabled(false);
             if ("error" in data) {
-                const errorEl = document.querySelector("#form-error");
-                errorEl.textContent = data.error;
-            } else {
-                // TODO: also hide event data
+                showError("#form-error", data.error);
+            } else if (data.action === "edit-approve") {
+                const eventEl = document.querySelector(`div[data-eventid="${data.eventid}"]`);
+                eventEl.classList.add("hidden");
+                updateForm();
             }
+            // else should it do something if it was just edited?
         } else {
-            // show error to user?
             console.log(data);
         }
-        console.log(data);
     } else {
-        console.log(`Change request responded with error:\n${this.status} ${this.responseText}`);
+        alert(`Change request responded with error: ${this.status} ${this.statusText}`);
     }
 }
 
@@ -71,12 +71,12 @@ function postRequest(params) {
 
     const req = new XMLHttpRequest();
     req.open("POST", "process-event.php?");
+    // IF PARAMS.ACTION INCLUDES EDIT -> set timeout x, add event listener
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     req.responseType = "json";
     req.addEventListener("load", changeRequestComplete);
     // how to test?
     req.addEventListener("error", () => alert("Request failed!\nPlease reload the page"));
-    console.log(params);
     req.send(params);
 
     // TODO:
@@ -111,6 +111,8 @@ function handleSubmit(e) {
             params.set(key, val);
         }
         eventid = e.currentTarget.form.dataset.eventid;
+        document.querySelector("#spinner").classList.remove("hidden");
+        setButtonsDisabled(true);
     }
     params.set("eventid", eventid);
     const event = helper.getEventById(Number(eventid));
@@ -203,24 +205,26 @@ function updateForm(e) {
     const eventid = (function getEventId() {
         // for when I explicitly call the function without an event
         if (e === undefined) {
+            // maybe instead of showing the first not hidden event in the form
+            // show the next event after the one that was processed?
             const allEvents = document.querySelectorAll(".unprocessed-event");
             const eventEl = Array.from(allEvents).find(node => !node.classList.contains("hidden"));
-            return eventEl.dataset.eventid;
+            // highlight the event that is now shown in the form
+            return eventEl?.dataset.eventid;
         } else {
             return e.currentTarget.parentNode.dataset.eventid;
         }
     })();
 
     const form = document.querySelector("#form");
-    // to show the user if something went wrong
     if (eventid === undefined) {
         form.reset();
+        form.dataset.eventid = null;
+    } else {
+        const event = helper.getEventById(Number(eventid));
+        fillForm(event);
+        form.dataset.eventid = eventid;
     }
-    const event = helper.getEventById(Number(eventid));
-    fillForm(event);
-
-    form.dataset.eventid = eventid;
-    form.querySelectorAll("[type=submit]").forEach((button) => button.addEventListener("click", handleSubmit));
 }
 
 function makeNameEl(name) {
@@ -281,6 +285,8 @@ function start() {
 
         listEl.appendChild(eventEl);
     });
+
+    document.querySelectorAll("[type=submit]").forEach((button) => button.addEventListener("click", handleSubmit));
     updateForm();
 }
 
