@@ -66,10 +66,12 @@ class View {
         this.selectedDate = new Date(date + "T00:00:00.000Z");
     }
 
-    // remove all elements that are added in a view so appending again won't duplicate
     static resetView() {
         const grid = document.querySelector("#" + View.calendarGrid);
         grid.replaceChildren();
+
+        // how can I call a popover's methods like hide()? getInstance()?
+        document.querySelectorAll(".popover").forEach((popover) => popover.remove());
     }
 }
 
@@ -209,6 +211,7 @@ class MonthView extends View {
     // trigger: click means you have to press on the trigger element again to close it and multiple popovers can be opened
     // trigger: focus means you clicking in the popover closes it (bad, probably)
     // -> maybe read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
+    // BETTER: https://stackoverflow.com/a/15945492/15707077
     makePopovers() {
         const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
         const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => {
