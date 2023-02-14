@@ -33,9 +33,23 @@ function showError(elementId, error) {
     errorEl.classList.remove("hidden");
 }
 
+/**
+ * set the disabled state of the buttons. form buttons are only enabled for moderators.
+ * @param {*} newState
+ */
 function setButtonsDisabled(newState) {
-    const allButtons = document.querySelectorAll("button, input[type=submit]");
-    allButtons.forEach((button) => button.disabled = newState);
+    document.querySelectorAll(".moderator-wrapper button")
+        .forEach((button) => button.disabled = newState);
+
+    const isModerator = helper.isRole(helper.role.moderator);
+    document.querySelectorAll(".moderator-wrapper input[type=submit]")
+        .forEach((button) => {
+            if (isModerator) {
+                button.disabled = newState;
+            } else {
+                button.disabled = true;
+            }
+        });
 }
 
 // load event
@@ -288,5 +302,7 @@ function start() {
 
     document.querySelectorAll("[type=submit]").forEach((button) => button.addEventListener("click", handleSubmit));
     updateForm();
+    // enable form buttons for moderators
+    setButtonsDisabled(false);
 }
 

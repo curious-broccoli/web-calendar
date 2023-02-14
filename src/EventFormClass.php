@@ -70,8 +70,8 @@ class EventForm {
                 <input type="submit" name="submit" value="Submit" />
             <?php
             } else if ($this->target === "edit") { ?>
-                <input type="submit" id="edit" name="edit" value="Edit" />
-                <input type="submit" id="edit-approve" name="edit-approve" value="Edit & Approve" />
+                <input type="submit" id="edit" name="edit" value="Edit" disabled/>
+                <input type="submit" id="edit-approve" name="edit-approve" value="Edit & Approve" disabled/>
                 <div id="spinner" class="spinner-border hidden" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>

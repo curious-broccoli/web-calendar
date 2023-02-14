@@ -3,6 +3,7 @@ $title = "Moderator";
 $my_scripts = [
     ["name" => "admin.js", "isModule" => true]
 ];
+$pass_role = true;
 include __DIR__ . "/../src/top.php";
 require_once __DIR__ . "/../src/dbconnection.php";
 require_once __DIR__ . "/../src/Role.php";

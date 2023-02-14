@@ -33,3 +33,25 @@ export function getUtcString(date, time) {
     const d = new Date(date + "T" + time);
     return d.toISOString();
 }
+
+// would be better if these values were taken from the database somehow
+// to keep them up to date
+export const role = Object.freeze({
+    default: 10,
+    approver: 20,
+    moderator: 30,
+});
+
+/**
+ *
+ * @param {role} role the role you want to check for (pass one of the role's properties)
+ * @returns
+ */
+export function isRole(role) {
+    const roleId = document.body.dataset.role;
+    if (roleId) {
+        return role === +roleId;
+    } else {
+        return false;
+    }
+}
