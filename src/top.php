@@ -1,3 +1,19 @@
+<?php
+require_once __DIR__ . "/../src/dbconnection.php";
+
+if (isset($pass_role) && $pass_role === true) {
+    session_start();
+    if (isset($_SESSION["userid"])) {
+        $role = get_user_role($_SESSION["userid"], $dbh);
+        $role_element = "data-role={$role->value}";
+    } else {
+        $role_element = null;
+    }
+} else {
+    $role_element = null;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,7 +34,7 @@
     <title><?= $title ?></title>
 </head>
 
-<body>
+<body <?= $role_element?>>
     <?php
     if (!isset($hide_nav)) { ?>
         <nav>
