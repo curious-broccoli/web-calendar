@@ -93,7 +93,29 @@ li.grid-header {
 
 .calendar-header {
     display: flex;
+}
+
+#calendar-header-text {
     font-weight: bold;
+}
+
+#view-tabs {
+    margin-left: auto;
+}
+
+input[type="radio"] {
+    display: none;
+    /* opacity: 0; maybe for better accessibility? */
+    /* pointer-events: none; ?? */
+}
+
+#view-tabs label {
+    padding-bottom: 3px;
+    padding-top: 3px
+}
+
+input[type="radio"]:checked + label {
+    background-color: var(--calendar-header-color);
 }
 
 .event {

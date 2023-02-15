@@ -266,29 +266,54 @@ class MonthView extends View {
     }
 }
 
+function getNewView() {
+    //should check if it is valid date (some browsers might default to text input field)
+    //else maybe set as today
+    const selectedDate = document.querySelector("#date-picker").value;
+    const selectedView = document.querySelector("#view-tabs input[type=radio]:checked").value;
+
+    let newView;
+    switch (selectedView) {
+        case "list":
+            newView = new ListView(selectedDate);
+            break;
+        case "day":
+            newView = new DayView(selectedDate);
+            break;
+        case "workweek":
+            newView = new WorkweekView(selectedDate);
+            break;
+        case "week":
+            newView = new WeekView(selectedDate);
+            break;
+        case "month":
+            newView = new MonthView(selectedDate);
+            break;
+        case "year":
+            newView = new YearView(selectedDate);
+            break;
+    }
+    return newView;
+}
+
+// the default value should be like a user setting
+// do I have to get the value from the checked
 function draw() {
     View.resetView();
-    const datePicker = document.querySelector("#date-picker");
-    //should check if it is valid date (some browsers might default to text input)
-    //else maybe set as today
-    const v = new MonthView(datePicker.value);
-    v.drawCalendarHeader();
-    v.drawGridHeader();
-    v.drawGrid();
-    v.makePopovers();
+
+    const view = getNewView();
+    view.drawCalendarHeader();
+    view.drawGridHeader();
+    view.drawGrid();
+    view.makePopovers();
 }
 
 //rename to something better
 function start() {
-    draw();
     const datePicker = document.querySelector("#date-picker");
     datePicker.addEventListener("change", () => draw());
+    const tabsEl = document.querySelector("#view-tabs");
+    tabsEl.addEventListener("change", () => draw());
+
+    draw();
 }
-
-
-
-
-
-
-
-
