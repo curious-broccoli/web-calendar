@@ -64,15 +64,16 @@ Date.prototype.getDaysInMonth = function () {
 class View {
     // class names and ids of the html classes for the main sections
     // can be class name and id at the same time
-
-    /** section with the date picker and view picker */
-    static calendarHeader = "calendar-header";
-    /** section with the day elements and the day names */
-    static calendarGrid = "calendar-grid";
-    /** class for just the day names in the grid */
-    static gridHeader = "grid-header";
-    /** class for the days */
-    static gridContent = "grid-content";
+    identifiers = {
+        /** section with the date picker and view picker */
+        calendarHeader: "calendar-header",
+        /** section with the day elements and the day names */
+        calendarGrid: "calendar-grid",
+        /** class for just the day names in the grid */
+        gridHeader: "grid-header",
+        /** class for the days */
+        gridContent: "grid-content",
+    };
 
     constructor(date) {
         this.selectedDate = new Date(date);
@@ -86,22 +87,23 @@ class View {
     }
 
     draw() {
+        this.resetView();
         this.drawCalendarHeader();
         this.drawGridHeader();
         this.drawGrid();
-        this.makePopovers();
+        View.makePopovers();
     }
 
-    static resetGridClass() {
-        const grid = document.querySelector("#" + View.calendarGrid);
+    resetGridClass() {
+        const grid = document.querySelector("#" + this.identifiers.calendarGrid);
         const viewClasses = ["list", "day", "workweek", "week", "month", "year"];
         viewClasses.forEach((className) => grid.classList.remove(className));
     }
 
-    static resetView() {
-        const grid = document.querySelector("#" + View.calendarGrid);
+    resetView() {
+        const grid = document.querySelector("#" + this.identifiers.calendarGrid);
         grid.replaceChildren();
-        View.resetGridClass();
+        this.resetGridClass();
 
         // how can I call a popover's methods like hide() -> bootstrap.popover.getInstance()?
         document.querySelectorAll(".popover").forEach((popover) => popover.remove());
@@ -111,7 +113,7 @@ class View {
     // trigger: focus means you clicking in the popover closes it (bad, probably)
     // -> maybe read https://stackoverflow.com/questions/8947749/how-can-i-close-a-twitter-bootstrap-popover-with-a-click-from-anywhere-else-on
     // BETTER: https://stackoverflow.com/a/15945492/15707077
-    makePopovers() {
+    static makePopovers() {
         const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
         const popoverList = [...popoverTriggerList].map((popoverTriggerEl) => {
             const event = helper.getEventById(+popoverTriggerEl.dataset.eventid);
@@ -190,10 +192,10 @@ class MonthView extends View {
             dayNames.push(monday.toLocaleDateString(locale, options));
             monday.setDate(monday.getDate() + 1);
         }
-        const grid = document.querySelector("#" + View.calendarGrid);
+        const grid = document.querySelector("#" + this.identifiers.calendarGrid);
         dayNames.forEach(dayName => {
             const li = document.createElement("li");
-            li.className += View.gridHeader;
+            li.className += this.identifiers.gridHeader;
             li.textContent = dayName;
             grid.appendChild(li);
         });
@@ -202,7 +204,7 @@ class MonthView extends View {
     #drawOtherDays(grid, start, end, class_string, text) {
     for (let i = start; i < end; i++) {
             const day = document.createElement("li");
-            day.classList.add(class_string, View.gridContent);
+        day.classList.add(class_string, this.identifiers.gridContent);
             const span = document.createElement("span");
             span.textContent = text;
             day.appendChild(span);
@@ -255,7 +257,7 @@ class MonthView extends View {
             }
         })();
 
-        const grid = document.querySelector("#" + View.calendarGrid);
+        const grid = document.querySelector("#" + this.identifiers.calendarGrid);
         grid.classList.add("month");
         // number of rows is needed for grid row height
         grid.setAttribute("grid-rows", totalDaysShown / 7);
@@ -264,7 +266,7 @@ class MonthView extends View {
         const events = helper.getEvents();
         for (let i = 1; i <= numberOfDays; i++) {
             const day = document.createElement("li");
-            day.className += View.gridContent;
+            day.className += this.identifiers.gridContent;
             if (this.#isSameDay(today, i)) {
                 day.id = "today";
             }
@@ -306,9 +308,6 @@ class WeekView extends View {
         const direction = e.currentTarget.id == "date-arrow-right" ? 1 : -1;
 
         const newDate = addWeeks(selectedDate, direction);
-        console.log(selectedDate);
-        console.log(newDate);
-        console.log(" ");
         // Swedish locale easily sets it to the ISO 8601 format
         // which is used by the "date" input element
         const locale = "sv";
@@ -327,10 +326,10 @@ class WeekView extends View {
             const day = addDays(this.weekStart, i);
             dayNames.push(day.toLocaleDateString(locale, options));
         }
-        const grid = document.querySelector("#" + View.calendarGrid);
+        const grid = document.querySelector("#" + this.identifiers.calendarGrid);
         dayNames.forEach(dayName => {
             const li = document.createElement("li");
-            li.className += View.gridHeader;
+            li.className += this.identifiers.gridHeader;
             li.textContent = dayName;
             grid.appendChild(li);
         });
@@ -340,7 +339,7 @@ class WeekView extends View {
     #drawOtherDays(grid, start, end, class_string, text) {
         for (let i = start; i < end; i++) {
             const day = document.createElement("li");
-            day.classList.add(class_string, View.gridContent);
+            day.classList.add(class_string, this.identifiers.gridContent);
             const span = document.createElement("span");
             span.textContent = text;
             day.appendChild(span);
@@ -397,7 +396,7 @@ class WeekView extends View {
             }
         })();
 
-        const grid = document.querySelector("#" + View.calendarGrid);
+        const grid = document.querySelector("#" + this.identifiers.calendarGrid);
         // number of rows is needed for grid row height
         grid.setAttribute("grid-rows", totalDaysShown / 7);
         if (this.workDays === 7) {
@@ -405,12 +404,12 @@ class WeekView extends View {
         } else {
             grid.classList.add("workweek");
         }
-        this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev");
+        //this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev");
         const today = new Date();
         const events = helper.getEvents();
         for (let i = 1; i <= numberOfDays; i++) {
             const day = document.createElement("li");
-            day.className += View.gridContent;
+            day.className += this.identifiers.gridContent;
             if (this.#isSameDay(today, i)) {
                 day.id = "today";
             }
@@ -425,9 +424,9 @@ class WeekView extends View {
             const events_today = this.#getEventsForDay(events, i)
             events_today.forEach((e) => container.appendChild(this.#createEventElement(e)));
             day.appendChild(container);
-            grid.appendChild(day);
+            //grid.appendChild(day);
         }
-        this.#drawOtherDays(grid, numberOfDays + firstDayOn, totalDaysShown, "month-next", "next");
+        //this.#drawOtherDays(grid, numberOfDays + firstDayOn, totalDaysShown, "month-next", "next");
     }
 }
 
@@ -466,9 +465,7 @@ function getNewView() {
 }
 
 function draw() {
-    View.resetView();
     const view = getNewView();
-    console.log(view);
     view.draw();
 }
 
