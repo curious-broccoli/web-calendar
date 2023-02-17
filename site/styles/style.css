@@ -39,13 +39,8 @@ ol.calendar-grid {
     height: 100%;
 }
 
-ol.calendar-grid.month,
-ol.calendar-grid.week {
+ol.calendar-grid.month {
     grid-template-columns: repeat(7, 1fr);
-}
-
-ol.calendar-grid.workweek {
-    grid-template-columns: repeat(5, 1fr);
 }
 
 /* because attr() doesn't really work*/
@@ -61,9 +56,244 @@ ol.calendar-grid.month[grid-rows="6"] {
     grid-template-rows: auto repeat(6, 1fr);
 }
 
-/* ol.calendar-grid "CLASS" {
-    grid-template-rows: auto, repeat(x, 1fr);
-} */
+ol.calendar-grid.week {
+    grid-template-columns: auto repeat(7, 1fr);
+}
+
+ol.calendar-grid.workweek {
+    grid-template-columns: auto repeat(5, 1fr);
+}
+
+ol.calendar-grid.week,
+ol.calendar-grid.workweek {
+    grid-template-rows: auto repeat(24, 1fr);
+}
+
+ol.calendar-grid.week {
+    grid-template-areas:
+        ". header0 header1 header2 header3 header4 header5 header6"
+        "hour0 day0 day1 day2 day3 day4 day5 day6"
+        "hour1 day0 day1 day2 day3 day4 day5 day6"
+        "hour2 day0 day1 day2 day3 day4 day5 day6"
+        "hour3 day0 day1 day2 day3 day4 day5 day6"
+        "hour4 day0 day1 day2 day3 day4 day5 day6"
+        "hour5 day0 day1 day2 day3 day4 day5 day6"
+        "hour6 day0 day1 day2 day3 day4 day5 day6"
+        "hour7 day0 day1 day2 day3 day4 day5 day6"
+        "hour8 day0 day1 day2 day3 day4 day5 day6"
+        "hour9 day0 day1 day2 day3 day4 day5 day6"
+        "hour10 day0 day1 day2 day3 day4 day5 day6"
+        "hour11 day0 day1 day2 day3 day4 day5 day6"
+        "hour12 day0 day1 day2 day3 day4 day5 day6"
+        "hour13 day0 day1 day2 day3 day4 day5 day6"
+        "hour14 day0 day1 day2 day3 day4 day5 day6"
+        "hour15 day0 day1 day2 day3 day4 day5 day6"
+        "hour16 day0 day1 day2 day3 day4 day5 day6"
+        "hour17 day0 day1 day2 day3 day4 day5 day6"
+        "hour18 day0 day1 day2 day3 day4 day5 day6"
+        "hour19 day0 day1 day2 day3 day4 day5 day6"
+        "hour20 day0 day1 day2 day3 day4 day5 day6"
+        "hour21 day0 day1 day2 day3 day4 day5 day6"
+        "hour22 day0 day1 day2 day3 day4 day5 day6"
+        "hour23 day0 day1 day2 day3 day4 day5 day6";
+}
+
+ol.calendar-grid.workweek {
+    grid-template-areas:
+        ". header0 header1 header2 header3 header4"
+        "hour0 day0 day1 day2 day3 day4"
+        "hour1 day0 day1 day2 day3 day4"
+        "hour2 day0 day1 day2 day3 day4"
+        "hour3 day0 day1 day2 day3 day4"
+        "hour4 day0 day1 day2 day3 day4"
+        "hour5 day0 day1 day2 day3 day4"
+        "hour6 day0 day1 day2 day3 day4"
+        "hour7 day0 day1 day2 day3 day4"
+        "hour8 day0 day1 day2 day3 day4"
+        "hour9 day0 day1 day2 day3 day4"
+        "hour10 day0 day1 day2 day3 day4"
+        "hour11 day0 day1 day2 day3 day4"
+        "hour12 day0 day1 day2 day3 day4"
+        "hour13 day0 day1 day2 day3 day4"
+        "hour14 day0 day1 day2 day3 day4"
+        "hour15 day0 day1 day2 day3 day4"
+        "hour16 day0 day1 day2 day3 day4"
+        "hour17 day0 day1 day2 day3 day4"
+        "hour18 day0 day1 day2 day3 day4"
+        "hour19 day0 day1 day2 day3 day4"
+        "hour20 day0 day1 day2 day3 day4"
+        "hour21 day0 day1 day2 day3 day4"
+        "hour22 day0 day1 day2 day3 day4"
+        "hour23 day0 day1 day2 day3 day4";
+}
+
+.hour0 {
+    grid-area: hour0;
+}
+
+.hour1 {
+    grid-area: hour1;
+}
+
+.hour2 {
+    grid-area: hour2;
+}
+
+.hour3 {
+    grid-area: hour3;
+}
+
+.hour4 {
+    grid-area: hour4;
+}
+
+.hour5 {
+    grid-area: hour5;
+}
+
+.hour6 {
+    grid-area: hour6;
+}
+
+.hour7 {
+    grid-area: hour7;
+}
+
+.hour8 {
+    grid-area: hour8;
+}
+
+.hour9 {
+    grid-area: hour9;
+}
+
+.hour10 {
+    grid-area: hour10;
+}
+
+.hour11 {
+    grid-area: hour11;
+}
+
+.hour12 {
+    grid-area: hour12;
+}
+
+.hour13 {
+    grid-area: hour13;
+}
+
+.hour14 {
+    grid-area: hour14;
+}
+
+.hour15 {
+    grid-area: hour15;
+}
+
+.hour16 {
+    grid-area: hour16;
+}
+
+.hour17 {
+    grid-area: hour17;
+}
+
+.hour18 {
+    grid-area: hour18;
+}
+
+.hour19 {
+    grid-area: hour19;
+}
+
+.hour20 {
+    grid-area: hour20;
+}
+
+.hour21 {
+    grid-area: hour21;
+}
+
+.hour22 {
+    grid-area: hour22;
+}
+
+.hour23 {
+    grid-area: hour23;
+}
+
+.header0 {
+    grid-area: header0;
+}
+
+.header1 {
+    grid-area: header1;
+}
+
+.header2 {
+    grid-area: header2;
+}
+
+.header3 {
+    grid-area: header3;
+}
+
+.header4 {
+    grid-area: header4;
+}
+
+.header5 {
+    grid-area: header5;
+}
+
+.header6 {
+    grid-area: header6;
+}
+
+.day0 {
+    grid-area: day0;
+}
+
+.day1 {
+    grid-area: day1;
+}
+
+.day2 {
+    grid-area: day2;
+}
+
+.day3 {
+    grid-area: day3;
+}
+
+.day4 {
+    grid-area: day4;
+}
+
+.day5 {
+    grid-area: day5;
+}
+
+.day6 {
+    grid-area: day6;
+}
+
+li.grid-ruler {
+    height: 60px;
+}
+
+/* probably a bad way to do it */
+li.grid-ruler::after {
+    position: absolute;
+    left: 0;
+    content: "";
+    display: block;
+    height: 40px; /* I assume this might cause problems in future */
+    border-bottom: 1px solid grey;
+    width: 100%;
+    pointer-events: none;
+}
 
 li.grid-content {
     overflow-y: hidden;
@@ -94,7 +324,7 @@ li.grid-header {
     background-color: rgb(226, 225, 225);
 }
 
-.calendar-grid li:hover {
+.calendar-grid li.grid-content:hover {
     background-color: var(--day-hover-color);
 }
 

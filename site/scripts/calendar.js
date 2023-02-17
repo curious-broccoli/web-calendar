@@ -1,6 +1,6 @@
 "use strict";
 import * as helper from "./helper.js";
-import { startOfISOWeek, endOfISOWeek, addDays, addWeeks, addMonths } from 'https://esm.run/date-fns';
+import { startOfISOWeek, endOfISOWeek, addDays, addWeeks, addMonths, setMinutes, setHours } from 'https://esm.run/date-fns';
 
 function eventsLoaded () {
     if (this.status === 200) {
@@ -94,16 +94,16 @@ class View {
         View.makePopovers();
     }
 
-    resetGridClass() {
-        const grid = document.querySelector("#" + this.identifiers.calendarGrid);
+    resetGridClass(grid) {
         const viewClasses = ["list", "day", "workweek", "week", "month", "year"];
         viewClasses.forEach((className) => grid.classList.remove(className));
+        grid.removeAttribute("grid-rows");
     }
 
     resetView() {
         const grid = document.querySelector("#" + this.identifiers.calendarGrid);
         grid.replaceChildren();
-        this.resetGridClass();
+        this.resetGridClass(grid);
 
         // how can I call a popover's methods like hide() -> bootstrap.popover.getInstance()?
         document.querySelectorAll(".popover").forEach((popover) => popover.remove());
@@ -288,12 +288,12 @@ class MonthView extends View {
 }
 
 class WeekView extends View {
-    constructor(date, workDays) {
+    constructor(date, weekDays) {
         super(date);
         this.weekStart = startOfISOWeek(this.selectedDate);
         // 5 for workweek, 7 for whole week
-        this.workDays = workDays;
-        this.weekEnd = addDays(this.weekStart, this.workDays - 1);
+        this.weekDays = weekDays;
+        this.weekEnd = addDays(this.weekStart, this.weekDays - 1);
     }
 
     drawCalendarHeader() {
@@ -321,18 +321,17 @@ class WeekView extends View {
             weekday: "long",
             day: "numeric",
             month: "short" };
-        const dayNames = [];
-        for (let i = 0; i < this.workDays; i++) {
-            const day = addDays(this.weekStart, i);
-            dayNames.push(day.toLocaleDateString(locale, options));
-        }
+
         const grid = document.querySelector("#" + this.identifiers.calendarGrid);
-        dayNames.forEach(dayName => {
+        for (let i = 0; i < this.weekDays; i++) {
+            const day = addDays(this.weekStart, i);
+            const dayName = day.toLocaleDateString(locale, options);
+
             const li = document.createElement("li");
-            li.className += this.identifiers.gridHeader;
+            li.classList.add(this.identifiers.gridHeader, "header" + i);
             li.textContent = dayName;
             grid.appendChild(li);
-        });
+        }
     }
 
     // TODO
@@ -373,37 +372,42 @@ class WeekView extends View {
         return div;
     }
 
+    #makeRuler(grid) {
+        const locale = navigator.language;
+        const options = {
+            hour: "2-digit",
+            minute: "2-digit" };
+
+        for (let i = 0; i < 24; i++) {
+            const hourEl = document.createElement("li");
+            hourEl.classList.add("grid-ruler", "hour" + i)
+            // maybe make it so a potential am/pm would be after a line break
+            // to save horizontal space
+            const hourDate = setHours(setMinutes(this.selectedDate, 0), i);
+            const text = hourDate.toLocaleTimeString(locale, options);
+            hourEl.textContent = text;
+            grid.appendChild(hourEl);
+        }
+    }
+
     // TODO
     drawGrid() {
-        const numberOfDays = this.selectedDate.getDaysInMonth();
-        // Monday - Sunday : 0 - 6
-        const firstDayOn = (() => {
-            const firstDay = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth(), 1);
-            return firstDay.getDay() == 0 ? 6 : firstDay.getDay() - 1;
-        })();
-
-        const totalDaysShown = (() => {
-            const minDays = numberOfDays + firstDayOn;
-            const daysPerRow = 7;
-            if (minDays == 28) {
-                return daysPerRow * 4;
-            }
-            else if (minDays <= 35) {
-                return daysPerRow * 5;
-            }
-            else {
-                return daysPerRow * 6;
-            }
-        })();
-
         const grid = document.querySelector("#" + this.identifiers.calendarGrid);
-        // number of rows is needed for grid row height
-        grid.setAttribute("grid-rows", totalDaysShown / 7);
-        if (this.workDays === 7) {
+        if (this.weekDays === 7) {
             grid.classList.add("week");
         } else {
             grid.classList.add("workweek");
         }
+
+        this.#makeRuler(grid);
+
+        for (let i = 0; i < this.weekDays; i++) {
+            const day = document.createElement("li");
+            day.classList.add(this.identifiers.gridContent, "day" + i);
+            grid.appendChild(day);
+        }
+
+        return;
         //this.#drawOtherDays(grid, 0, firstDayOn, "month-prev", "prev");
         const today = new Date();
         const events = helper.getEvents();
